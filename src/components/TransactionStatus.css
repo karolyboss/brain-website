@@ -1,0 +1,80 @@
+.transaction-status {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgb(0 0 0 / 95%);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  max-width: 400px;
+  min-width: 200px;
+  animation: slide-in 0.3s ease-out;
+}
+
+.balance-info {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #8a2be2;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.signature {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.error {
+  color: #f44;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.retry-count {
+  font-size: 0.8rem;
+  color: #ffa500;
+}
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg);
+  }
+
+  100% { 
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

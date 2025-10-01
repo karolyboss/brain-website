@@ -80,11 +80,11 @@ body {
 
 /* Countdown timer styles */
 .countdown-container {
-  background: linear-gradient(135deg, rgba(255,45,149,0.2), rgba(138,43,226,0.2));
+  background: linear-gradient(135deg, rgb(255 45 149 / 20%), rgb(138 43 226 / 20%));
   border-radius: 15px;
   padding: 1.5rem;
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
 }
 
 .countdown-label {
@@ -102,7 +102,7 @@ body {
 }
 
 .countdown-item {
-  background: rgba(0,0,0,0.5);
+  background: rgb(0 0 0 / 50%);
   border: 1px solid #ff2d95;
   border-radius: 8px;
   padding: 0.5rem;
@@ -156,12 +156,12 @@ body {
 
 /* Buy token section styles */
 .buy-token-container {
-  background: rgba(10, 5, 20, 0.9);
+  background: rgb(10 5 20 / 90%);
   border-radius: 15px;
   padding: 1rem;
   margin: 1rem;
-  border: 1px solid rgba(255, 45, 149, 0.7);
-  box-shadow: 0 0 20px rgba(255, 45, 149, 0.3);
+  border: 1px solid rgb(255 45 149 / 70%);
+  box-shadow: 0 0 20px rgb(255 45 149 / 30%);
 }
 
 @media screen and (min-width: 768px) {
@@ -173,13 +173,6 @@ body {
 
 .buy-token-title {
   font-size: 2rem;
-}
-
-@media screen and (min-width: 768px) {
-  .buy-token-title {
-    font-size: 3rem;
-  }
-}
   font-weight: bold;
   margin-bottom: 1rem;
   background: linear-gradient(90deg, #ff2d95, #8a2be2, #00dbde);
@@ -188,6 +181,12 @@ body {
   color: transparent;
   background-clip: text;
   text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  .buy-token-title {
+    font-size: 3rem;
+  }
 }
 
 .buy-token-subtitle {
@@ -243,8 +242,8 @@ body {
 .form-input {
   width: 100%;
   padding: 0.8rem;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 8px;
   color: white;
   font-size: 1rem;
@@ -254,7 +253,7 @@ body {
   width: 100%;
   height: 8px;
   border-radius: 4px;
-  background: rgba(255,255,255,0.1);
+  background: rgb(255 255 255 / 10%);
   outline: none;
   -webkit-appearance: none;
 }
@@ -311,9 +310,9 @@ body {
 .social-verification {
   margin-top: 1rem;
   padding: 1rem;
-  background: rgba(138,43,226,0.1);
+  background: rgb(138 43 226 / 10%);
   border-radius: 10px;
-  border: 1px solid rgba(138,43,226,0.3);
+  border: 1px solid rgb(138 43 226 / 30%);
   display: none;
 }
 
@@ -387,7 +386,7 @@ body {
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 8px;
-  background: rgba(0,0,0,0.2);
+  background: rgb(0 0 0 / 20%);
   text-align: center;
   display: none;
 }
@@ -407,9 +406,9 @@ body {
 .manual-payment {
   margin-top: 1.5rem;
   padding: 1.5rem;
-  background: rgba(255,94,0,0.1);
+  background: rgb(255 94 0 / 10%);
   border-radius: 10px;
-  border: 1px solid rgba(255,94,0,0.3);
+  border: 1px solid rgb(255 94 0 / 30%);
   display: none;
 }
 

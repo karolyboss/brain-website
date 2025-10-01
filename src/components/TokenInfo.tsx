@@ -1,19 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import './TokenInfo.css';
 
 export default function TokenInfo() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Token details as per project specifications
   const tokenDetails = [
@@ -39,8 +28,8 @@ export default function TokenInfo() {
       style={{
         background: 'rgba(10, 5, 20, 0.9)',
         borderRadius: '15px',
-        padding: isMobile ? '1rem' : '2rem',
-        margin: isMobile ? '1rem' : '2rem auto',
+        padding: '2rem',
+        margin: '2rem auto',
         border: '1px solid rgba(138, 43, 226, 0.5)',
         boxShadow: '0 0 20px rgba(138, 43, 226, 0.3)',
         maxWidth: '100%',
@@ -48,9 +37,9 @@ export default function TokenInfo() {
       }}
     >
       <h2 style={{
-        fontSize: isMobile ? '1.75rem' : '2.5rem',
+        fontSize: '2.5rem',
         fontWeight: 'bold',
-        marginBottom: isMobile ? '1rem' : '2rem',
+        marginBottom: '2rem',
         color: '#8a2be2',
         textShadow: '0 0 10px rgba(138, 43, 226, 0.7)',
         textAlign: 'center',
@@ -59,14 +48,7 @@ export default function TokenInfo() {
         Tokenomics
       </h2>
       
-      <div style={{
-        display: 'flex',
-        flexDirection: window.innerWidth < 768 ? 'column' : 'row',
-        flexWrap: 'wrap',
-        gap: window.innerWidth < 768 ? '1rem' : '2rem',
-        justifyContent: 'center',
-        padding: window.innerWidth < 768 ? '0.5rem' : '1rem'
-      }}>
+      <div className="token-info-container">
         {/* Left Column - Distribution Pie Chart Visualization */}
         <div style={{
           flex: '1',
@@ -227,8 +209,8 @@ export default function TokenInfo() {
           
           {/* Contract Address Section */}
           <div style={{
-            marginTop: window.innerWidth < 768 ? '1rem' : '2rem',
-            padding: window.innerWidth < 768 ? '1rem' : '1.5rem',
+            marginTop: '2rem',
+            padding: '1.5rem',
             background: 'linear-gradient(135deg, rgba(138,43,226,0.2), rgba(0,219,222,0.2))',
             borderRadius: '12px',
             border: '1px solid rgba(138, 43, 226, 0.3)',
