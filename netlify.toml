@@ -5,6 +5,7 @@
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "20"
+  NEXT_PUBLIC_SOLANA_RPC_URL = "https://rpc.ankr.com/solana"
 
 # Production context: all deploys from the main/master branch
 [context.production]
