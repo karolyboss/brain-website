@@ -1,0 +1,24 @@
+{
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.enable": true,
+  "stylelint.snippet": [
+    "css",
+    "scss",
+    "sass",
+    "less"
+  ],
+  "stylelint.validate": [
+    "css",
+    "scss",
+    "sass",
+    "less"
+  ],
+  "files.associations": {
+    "*.css": "css"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}
