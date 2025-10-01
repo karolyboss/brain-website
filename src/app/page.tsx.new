@@ -1,0 +1,150 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL, Transaction, SystemProgram, PublicKey } from '@solana/web3.js';
+import TokenInfo from '@/components/TokenInfo';
+import { db } from '@/lib/db';
+import { transactions } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
+
+export default function Home() {
+  // Countdown timer state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 5,
+    hours: 6,
+    minutes: 0,
+    seconds: 0
+  });
+
+  // SOL amount state
+  const [solAmount, setSolAmount] = useState(1.0);
+  
+  // ROT amount calculation (1 SOL = 1,500,000 ROT with 50% bonus)
+  const rotAmount = Math.floor(solAmount * 1500000);
+  
+  // Transaction status
+  const [transactionStatus, setTransactionStatus] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Wallet and connection hooks
+  const { publicKey, sendTransaction, connected } = useWallet();
+  const { connection } = useConnection();
+
+  // Initialize countdown timer (5 days 6 hours from now)
+  useEffect(() => {
+    // Set the end time to 5 days and 6 hours from the initial load
+    const now = new Date();
+    const endTime = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000) + (6 * 60 * 60 * 1000)); // 5 days 6 hours from now
+    
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const difference = endTime.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        
+        return { days, hours, minutes, seconds };
+      }
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    };
+
+    // Set initial time
+    setTimeLeft(calculateTimeLeft());
+    
+    // Update every second
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format number with commas
+  const formatNumber = (num: number) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Handle slider change
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setSolAmount(value);
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseFloat(e.target.value);
+    if (isNaN(value)) value = 0.1;
+    if (value < 0.1) value = 0.1;
+    if (value > 10) value = 10;
+    setSolAmount(value);
+  };
+
+  // Handle purchase with Phantom wallet
+  const handlePurchase = async () => {
+    if (!publicKey) {
+      setTransactionStatus('Please connect your wallet first');
+      return;
+    }
+
+    if (!solAmount || solAmount < 0.1 || solAmount > 10) {
+      setTransactionStatus('Please enter a valid SOL amount (0.1 - 10 SOL)');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Record the initial transaction
+      await db.insert(transactions).values({
+        wallet_address: publicKey.toString(),
+        amount_sol: solAmount.toString(),
+        amount_rot: rotAmount.toString(),
+        status: 'pending'
+      });
+
+      // Check social verification
+      const socialVerified = localStorage.getItem('socialVerified') === 'true';
+      if (!socialVerified) {
+        setTransactionStatus('Please join our Telegram (https://t.me/rottedbrains) and follow us on X (https://x.com/kiralykaro61319?s=21) then click the verification button below.');
+        // Show social verification buttons
+        const socialVerification = document.getElementById('socialVerification');
+        if (socialVerification) {
+          socialVerification.style.display = 'block';
+        }
+        setIsProcessing(false);
+        return;
+      }
+
+      // Rest of your transaction logic here
+      // ... (your existing transaction code)
+
+      setTransactionStatus('Transaction successful!');
+      
+      // Update transaction status after successful payment
+      await db.update(transactions)
+        .set({ status: 'completed' })
+        .where(eq(transactions.wallet_address, publicKey.toString()))
+        .where(eq(transactions.status, 'pending'));
+
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      setTransactionStatus('Transaction failed: ' + (error as Error).message);
+      
+      // Update transaction status to failed
+      await db.update(transactions)
+        .set({ status: 'failed' })
+        .where(eq(transactions.wallet_address, publicKey.toString()))
+        .where(eq(transactions.status, 'pending'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    // ... rest of your component JSX
+  );
+}

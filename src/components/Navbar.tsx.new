@@ -1,0 +1,224 @@
+"use client";
+
+import Link from 'next/link';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useState, useEffect, useCallback } from 'react';
+
+export default function Navbar() {
+  const { publicKey, connected, disconnect } = useWallet();
+  const [balance, setBalance] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Balance management functions
+  const getInitialBalance = useCallback(() => {
+    if (!publicKey) return 0;
+    const storedBalance = localStorage.getItem(`rotBalance_${publicKey.toString()}`);
+    return storedBalance ? parseFloat(storedBalance) : 0;
+  }, [publicKey]);
+
+  const updateBalance = useCallback((newBalance: number) => {
+    if (!publicKey) return;
+    setBalance(newBalance);
+    localStorage.setItem(`rotBalance_${publicKey.toString()}`, newBalance.toString());
+  }, [publicKey]);
+
+  const fetchTokenBalance = useCallback(async () => {
+    if (!publicKey) return;
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const actualBalance = getInitialBalance();
+    setBalance(actualBalance);
+    setIsLoading(false);
+  }, [publicKey, getInitialBalance]);
+
+  useEffect(() => {
+    if (connected) {
+      fetchTokenBalance();
+    } else {
+      setBalance(null);
+    }
+  }, [connected, fetchTokenBalance]);
+
+  const navLinks = [
+    { href: "#features", text: "Features" },
+    { href: "#tokenomics", text: "Tokenomics" },
+    { href: "#roadmap", text: "Roadmap" },
+    { href: "#community", text: "Community" }
+  ];
+
+  return (
+    <nav style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
+      background: 'rgba(10, 5, 20, 0.95)',
+      backdropFilter: 'blur(10px)',
+      borderBottom: '1px solid rgba(138, 43, 226, 0.3)',
+      width: '100%'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: isMobile ? '0.5rem' : '1rem'
+      }}>
+        <Link href="/" style={{
+          fontSize: isMobile ? '1.2rem' : '1.5rem',
+          fontWeight: 'bold',
+          color: '#8a2be2',
+          textDecoration: 'none'
+        }}>
+          $ROT
+        </Link>
+
+        {isMobile ? (
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              padding: '0.5rem'
+            }}
+          >
+            ☰
+          </button>
+        ) : (
+          <div style={{
+            display: 'flex',
+            gap: '2rem',
+            alignItems: 'center'
+          }}>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  color: '#fff',
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#8a2be2';
+                  e.currentTarget.style.textShadow = '0 0 10px rgba(138, 43, 226, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.textShadow = 'none';
+                }}
+              >
+                {link.text}
+              </Link>
+            ))}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              {connected && balance !== null && (
+                <div style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(0, 219, 222, 0.5)',
+                  borderRadius: '8px',
+                  padding: '0.5rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#00ff9d',
+                    boxShadow: '0 0 10px #00ff9d'
+                  }} />
+                  <span style={{ color: '#00dbde', fontWeight: 'bold' }}>
+                    {isLoading ? 'Loading...' : `${balance.toLocaleString()} $ROT`}
+                  </span>
+                </div>
+              )}
+              <WalletMultiButton />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobile && menuOpen && (
+        <div style={{
+          padding: '1rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          borderTop: '1px solid rgba(138, 43, 226, 0.3)'
+        }}>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                color: '#fff',
+                textDecoration: 'none',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {link.text}
+            </Link>
+          ))}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            alignItems: 'stretch'
+          }}>
+            {connected && balance !== null && (
+              <div style={{
+                background: 'rgba(0,0,0,0.5)',
+                border: '1px solid rgba(0, 219, 222, 0.5)',
+                borderRadius: '8px',
+                padding: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#00ff9d',
+                  boxShadow: '0 0 10px #00ff9d'
+                }} />
+                <span style={{ color: '#00dbde', fontWeight: 'bold' }}>
+                  {isLoading ? 'Loading...' : `${balance.toLocaleString()} $ROT`}
+                </span>
+              </div>
+            )}
+            <div style={{ width: '100%' }}>
+              <WalletMultiButton style={{ width: '100%' }} />
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}

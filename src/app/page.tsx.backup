@@ -1,0 +1,2416 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+
+export default function Home() {
+  // Countdown timer state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 5,
+    hours: 6,
+    minutes: 0,
+    seconds: 0
+  });
+
+  // Initialize countdown timer (5 days 6 hours from now)
+  useEffect(() => {
+    // Set the end time to 5 days and 6 hours from the initial load
+    const now = new Date();
+    const endTime = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000) + (6 * 60 * 60 * 1000)); // 5 days 6 hours from now
+    
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const difference = endTime.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        
+        return { days, hours, minutes, seconds };
+      }
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    };
+
+    // Set initial time
+    setTimeLeft(calculateTimeLeft());
+    
+    // Update every second
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div style={{ 
+      backgroundColor: '#000', 
+      color: '#fff', 
+      minHeight: '100vh',
+      padding: '20px',
+      fontFamily: 'Arial, sans-serif',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <div style={{ 
+        maxWidth: '1000px', 
+        width: '100%',
+        textAlign: 'center'
+      }}>
+        {/* PRESALE HEADER */}
+        <h1 style={{ 
+          fontSize: '4rem',
+          fontWeight: 'bold',
+          marginBottom: '1rem',
+          background: 'linear-gradient(90deg, #ff2d95, #8a2be2, #00dbde)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          color: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          PRESALE
+        </h1>
+
+        {/* URGENT BADGE */}
+        <div style={{
+          display: 'inline-block',
+          background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+          color: 'white',
+          padding: '8px 20px',
+          borderRadius: '30px',
+          fontWeight: 'bold',
+          marginBottom: '2rem',
+          fontSize: '1.2rem',
+          animation: 'pulse 2s infinite'
+        }}>
+          ⚡ LIMITED TIME OFFER ⚡
+        </div>
+
+        {/* COUNTDOWN TIMER */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(138,43,226,0.2))',
+          borderRadius: '15px',
+          padding: '1.5rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <p style={{
+            fontSize: '1.2rem',
+            marginBottom: '1rem',
+            color: '#ff5e00',
+            fontWeight: 'bold'
+          }}>
+            ⏳ BONUS ENDS IN:
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{
+              background: 'rgba(0,0,0,0.5)',
+              border: '1px solid #ff2d95',
+              borderRadius: '8px',
+              padding: '0.5rem',
+              minWidth: '60px'
+            }}>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ff2d95'
+              }}>
+                {timeLeft.days.toString().padStart(2, '0')}
+              </div>
+              <div style={{
+                fontSize: '0.8rem',
+                color: '#aaa'
+              }}>
+                DAYS
+              </div>
+            </div>
+            
+            <div style={{
+              background: 'rgba(0,0,0,0.5)',
+              border: '1px solid #ff2d95',
+              borderRadius: '8px',
+              padding: '0.5rem',
+              minWidth: '60px'
+            }}>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ff2d95'
+              }}>
+                {timeLeft.hours.toString().padStart(2, '0')}
+              </div>
+              <div style={{
+                fontSize: '0.8rem',
+                color: '#aaa'
+              }}>
+                HOURS
+              </div>
+            </div>
+            
+            <div style={{
+              background: 'rgba(0,0,0,0.5)',
+              border: '1px solid #8a2be2',
+              borderRadius: '8px',
+              padding: '0.5rem',
+              minWidth: '60px'
+            }}>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#8a2be2'
+              }}>
+                {timeLeft.minutes.toString().padStart(2, '0')}
+              </div>
+              <div style={{
+                fontSize: '0.8rem',
+                color: '#aaa'
+              }}>
+                MINUTES
+              </div>
+            </div>
+            
+            <div style={{
+              background: 'rgba(0,0,0,0.5)',
+              border: '1px solid #00dbde',
+              borderRadius: '8px',
+              padding: '0.5rem',
+              minWidth: '60px'
+            }}>
+              <div style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#00dbde'
+              }}>
+                {timeLeft.seconds.toString().padStart(2, '0')}
+              </div>
+              <div style={{
+                fontSize: '0.8rem',
+                color: '#aaa'
+              }}>
+                SECONDS
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* BUY $ROT TOKEN SECTION */}
+        <div style={{
+          background: 'rgba(10, 5, 20, 0.9)',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 45, 149, 0.7)',
+          boxShadow: '0 0 20px rgba(255, 45, 149, 0.3)'
+        }}>
+          <h2 style={{
+            fontSize: '3rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #ff2d95, #8a2be2, #00dbde)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center'
+          }}>
+            Buy $ROT Tokens
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic',
+            textAlign: 'center'
+          }}>
+            Select your SOL amount and purchase $ROT tokens with Phantom wallet
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '2rem',
+            justifyContent: 'center'
+          }}>
+            {/* Purchase Form - Left Side */}
+            <div style={{
+              flex: '1',
+              minWidth: '300px',
+              maxWidth: '500px',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '15px',
+              padding: '2rem',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                marginBottom: '1.5rem',
+                color: '#ff2d95',
+                textAlign: 'center'
+              }}>
+                Purchase Tokens
+              </h3>
+              
+              {/* SOL Amount Input and Slider */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.5rem'
+                }}>
+                  <label style={{ color: '#aaa' }}>SOL Amount:</label>
+                  <span style={{ 
+                    fontWeight: 'bold', 
+                    color: '#ff2d95',
+                    fontSize: '1.2rem'
+                  }}>
+                    <span id="solAmountDisplay">1.0</span> SOL
+                  </span>
+                </div>
+                
+                {/* Manual Input Field */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <input 
+                    type="number" 
+                    id="solAmountInput"
+                    min="0.1" 
+                    max="10" 
+                    step="0.1" 
+                    defaultValue="1" 
+                    placeholder="Enter SOL amount"
+                    style={{
+                      width: '100%',
+                      padding: '0.8rem',
+                      background: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '8px',
+                      color: 'white',
+                      fontSize: '1rem'
+                    }}
+                  />
+                </div>
+                
+                {/* Slider */}
+                <input 
+                  type="range" 
+                  id="solAmountSlider"
+                  min="0.1" 
+                  max="10" 
+                  step="0.1" 
+                  defaultValue="1" 
+                  style={{
+                    width: '100%',
+                    height: '8px',
+                    borderRadius: '4px',
+                    background: 'rgba(255,255,255,0.1)',
+                    outline: 'none',
+                    WebkitAppearance: 'none'
+                  }}
+                />
+                
+                {/* Custom slider thumb styling */}
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    input[type="range"]::-webkit-slider-thumb {
+                      WebkitAppearance: none;
+                      appearance: none;
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      background: #ff2d95;
+                      cursor: pointer;
+                    }
+                    input[type="range"]::-moz-range-thumb {
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      background: #ff2d95;
+                      cursor: pointer;
+                      border: none;
+                    }
+                  `
+                }}></style>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: '0.5rem',
+                  color: '#777',
+                  fontSize: '0.9rem'
+                }}>
+                  <span>0.1 SOL</span>
+                  <span>10 SOL</span>
+                </div>
+              </div>
+              
+              {/* ROT Amount Display */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ 
+                  color: '#aaa', 
+                  marginBottom: '0.5rem',
+                  display: 'block'
+                }}>
+                  You will receive:
+                </label>
+                <div style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  borderRadius: '10px',
+                  padding: '1.5rem',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    fontSize: '2rem',
+                    fontWeight: 'bold',
+                    background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
+                    <span id="rotAmountDisplay">1,500,000</span> ROT
+                  </div>
+                  <div style={{ 
+                    color: '#aaa',
+                    marginTop: '0.5rem'
+                  }}>
+                    (50% Bonus - Phase 1)
+                  </div>
+                </div>
+              </div>
+              
+              {/* Buy Button */}
+              <button style={{
+                width: '100%',
+                padding: '1rem',
+                background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'transform 0.2s'
+              }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                Buy with Phantom Wallet
+              </button>
+              
+              {/* Transaction Status */}
+              <div style={{
+                marginTop: '1rem',
+                padding: '1rem',
+                borderRadius: '8px',
+                background: 'rgba(0,0,0,0.2)',
+                textAlign: 'center',
+                color: '#ff5e00',
+                display: 'none' // Hidden by default
+              }}>
+                Processing transaction...
+              </div>
+              
+              {/* Manual Payment - Hidden by default, shown only on error */}
+              <div id="manualPayment" style={{
+                marginTop: '1.5rem',
+                padding: '1.5rem',
+                background: 'rgba(255,94,0,0.1)',
+                borderRadius: '10px',
+                border: '1px solid rgba(255,94,0,0.3)',
+                display: 'none' // Hidden by default
+              }}>
+                <h4 style={{
+                  fontSize: '1.3rem',
+                  fontWeight: 'bold',
+                  color: '#ff5e00',
+                  marginBottom: '1rem',
+                  textAlign: 'center'
+                }}>
+                  Manual Payment Option
+                </h4>
+                
+                <p style={{
+                  color: '#ddd',
+                  marginBottom: '1rem',
+                  lineHeight: '1.6'
+                }}>
+                  If you're experiencing issues with the Phantom wallet integration, you can manually send SOL to this address:
+                </p>
+                
+                <div style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  marginBottom: '1rem',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    fontFamily: 'monospace',
+                    fontSize: '1rem',
+                    color: '#00dbde',
+                    wordBreak: 'break-all'
+                  }}>
+                    4vztUxqbpYwb48xRFSqqHZEGFcDW15WGEHth6SE4mU91
+                  </div>
+                </div>
+                
+                <p style={{
+                  color: '#ddd',
+                  lineHeight: '1.6'
+                }}>
+                  After sending, please contact support with your transaction ID. Your tokens will be delivered manually within 1-2 hours.
+                </p>
+              </div>
+            </div>
+            
+            {/* Information Panel - Right Side */}
+            <div style={{
+              flex: '1',
+              minWidth: '300px',
+              maxWidth: '500px',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '15px',
+              padding: '2rem',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                marginBottom: '1.5rem',
+                color: '#00dbde',
+                textAlign: 'center'
+              }}>
+                Purchase Information
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  padding: '1rem',
+                  background: 'rgba(138,43,226,0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(138,43,226,0.2)'
+                }}>
+                  <h4 style={{
+                    color: '#8a2be2',
+                    fontWeight: 'bold',
+                    marginBottom: '0.5rem'
+                  }}>
+                    Current Phase
+                  </h4>
+                  <p style={{ color: '#ddd' }}>
+                    Phase 1: 50% Bonus
+                    <br />
+                    <span style={{ fontSize: '0.9rem', color: '#aaa' }}>
+                      1 SOL = 1,500,000 ROT
+                    </span>
+                  </p>
+                </div>
+                
+                <div style={{
+                  padding: '1rem',
+                  background: 'rgba(0,219,222,0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(0,219,222,0.2)'
+                }}>
+                  <h4 style={{
+                    color: '#00dbde',
+                    fontWeight: 'bold',
+                    marginBottom: '0.5rem'
+                  }}>
+                    How to Buy
+                  </h4>
+                  <p style={{ color: '#ddd', fontSize: '0.9rem' }}>
+                    1. Connect your Phantom wallet
+                    <br />
+                    2. Select SOL amount (0.1 - 10 SOL)
+                    <br />
+                    3. Click "Buy with Phantom Wallet"
+                    <br />
+                    4. Confirm transaction in wallet
+                  </p>
+                </div>
+                
+                <div style={{
+                  padding: '1rem',
+                  background: 'rgba(255,45,149,0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,45,149,0.2)'
+                }}>
+                  <h4 style={{
+                    color: '#ff2d95',
+                    fontWeight: 'bold',
+                    marginBottom: '0.5rem'
+                  }}>
+                    Need Help?
+                  </h4>
+                  <p style={{ color: '#ddd', fontSize: '0.9rem' }}>
+                    If you encounter any issues, the manual payment option will appear after a failed transaction attempt.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add JavaScript for slider and input synchronization */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              // Wait for DOM to be fully loaded
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTokenCalculator);
+              } else {
+                initTokenCalculator();
+              }
+              
+              function initTokenCalculator() {
+                const slider = document.getElementById('solAmountSlider');
+                const input = document.getElementById('solAmountInput');
+                const solDisplay = document.getElementById('solAmountDisplay');
+                const rotDisplay = document.getElementById('rotAmountDisplay');
+                
+                // Format number with commas
+                function formatNumber(num) {
+                  return num.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",");
+                }
+                
+                // Set initial values
+                const initialSol = 1.0;
+                solDisplay.textContent = initialSol.toFixed(1);
+                rotDisplay.textContent = formatNumber(initialSol * 1500000);
+                
+                // Sync slider and input
+                slider.addEventListener('input', function() {
+                  const value = parseFloat(this.value);
+                  input.value = value;
+                  solDisplay.textContent = value.toFixed(1);
+                  rotDisplay.textContent = formatNumber(Math.floor(value * 1500000));
+                });
+                
+                input.addEventListener('input', function() {
+                  let value = parseFloat(this.value);
+                  if (isNaN(value)) value = 0.1;
+                  if (value < 0.1) value = 0.1;
+                  if (value > 10) value = 10;
+                  slider.value = value;
+                  solDisplay.textContent = value.toFixed(1);
+                  rotDisplay.textContent = formatNumber(Math.floor(value * 1500000));
+                });
+              }
+              
+              // Add slow increasing animation for phase 1 progress bar
+              function animatePhase1Progress() {
+                const progressBar = document.getElementById('phase1Progress');
+                if (progressBar) {
+                  // Reset to 0% for animation
+                  progressBar.style.width = '0%';
+                  
+                  // Animate to 36% over 3 seconds
+                  setTimeout(() => {
+                    progressBar.style.transition = 'width 3s ease-in-out';
+                    progressBar.style.width = '36%';
+                  }, 100);
+                }
+              }
+              
+              // Initialize the animation when DOM is loaded
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', animatePhase1Progress);
+              } else {
+                animatePhase1Progress();
+              }
+            })();
+          `
+        }}></script>
+
+        {/* Bonus Features Section */}
+        <div id="features" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '1.5rem',
+          marginBottom: '2rem'
+        }}>
+          {/* 50% Bonus Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(255,94,0,0.2))',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            border: '1px solid #ff2d95',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: '2.5rem',
+              marginBottom: '1rem',
+              color: '#ff2d95'
+            }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V12M21 12V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V12M21 12H3" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 5V19" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M7 8L10 11L7 14" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M17 8L14 11L17 14" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              color: '#ff2d95',
+              marginBottom: '0.5rem'
+            }}>
+              50% Bonus Tokens
+            </h3>
+            <p style={{
+              color: '#ddd',
+              fontSize: '0.9rem'
+            }}>
+              Double your $ROT allocation with our limited-time bonus offer
+            </p>
+          </div>
+          
+          {/* Early Access Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(138,43,226,0.2), rgba(0,219,222,0.2))',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            border: '1px solid #8a2be2',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: '2.5rem',
+              marginBottom: '1rem',
+              color: '#8a2be2'
+            }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8V12L15 15" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="#8a2be2" strokeWidth="2"/>
+                <path d="M12 3V6" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M21 12H18" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              color: '#8a2be2',
+              marginBottom: '0.5rem'
+            }}>
+              Early Access Price
+            </h3>
+            <p style={{
+              color: '#ddd',
+              fontSize: '0.9rem'
+            }}>
+              Get $ROT at the lowest price before public launch
+            </p>
+          </div>
+          
+          {/* Instant Delivery Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(0,219,222,0.2), rgba(0,255,157,0.2))',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            border: '1px solid #00dbde',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: '2.5rem',
+              marginBottom: '1rem',
+              color: '#00dbde'
+            }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2V22" stroke="#00dbde" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M12 2L19 9L12 2Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 2L5 9L12 2Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M5 15H19" stroke="#00dbde" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M3 20H21" stroke="#00dbde" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              color: '#00dbde',
+              marginBottom: '0.5rem'
+            }}>
+              Instant Delivery
+            </h3>
+            <p style={{
+              color: '#ddd',
+              fontSize: '0.9rem'
+            }}>
+              Tokens delivered immediately after payment confirmation
+            </p>
+          </div>
+        </div>
+
+        {/* PRESALE PHASES SECTION */}
+        <div style={{
+          background: 'rgba(10, 5, 20, 0.9)',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(138, 43, 226, 0.5)',
+          boxShadow: '0 0 20px rgba(138, 43, 226, 0.3)'
+        }}>
+          <h2 style={{
+            fontSize: '2.8rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            color: '#8a2be2',
+            textShadow: '0 0 10px rgba(138, 43, 226, 0.7)'
+          }}>
+            Presale Phases
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic'
+          }}>
+            Maximize your gains with our tiered bonus structure
+          </p>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '1.5rem'
+          }}>
+            {/* Phase 1 */}
+            <div style={{
+              background: 'rgba(255,45,149,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #ff2d95',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: '#ff2d95',
+                color: 'white',
+                padding: '0.5rem 1.5rem',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                borderRadius: '4px',
+                zIndex: 1
+              }}>
+                ACTIVE
+              </div>
+              
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#ff2d95',
+                marginBottom: '1rem'
+              }}>
+                Phase 1
+              </h3>
+              
+              <div style={{
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '0.5rem'
+              }}>
+                50% BONUS
+              </div>
+              
+              <p style={{
+                fontSize: '1.1rem',
+                color: '#ddd',
+                marginBottom: '1rem'
+              }}>
+                1 SOL = 1,500,000 $ROT
+              </p>
+              
+              <div style={{
+                height: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '5px',
+                overflow: 'hidden',
+                marginBottom: '0.5rem'
+              }}>
+                <div id="phase1Progress" style={{
+                  height: '100%',
+                  width: '36%',
+                  background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+                  borderRadius: '5px',
+                  transition: 'width 2s ease-in-out'
+                }}></div>
+              </div>
+              
+              <p style={{
+                fontSize: '0.9rem',
+                color: '#aaa'
+              }}>
+                36% SOLD • Ends in 24 hours
+              </p>
+            </div>
+            
+            {/* Phase 2 */}
+            <div style={{
+              background: 'rgba(0,219,222,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #00dbde',
+              opacity: '0.7'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#00dbde',
+                marginBottom: '1rem'
+              }}>
+                Phase 2
+              </h3>
+              
+              <div style={{
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '0.5rem'
+              }}>
+                30% BONUS
+              </div>
+              
+              <p style={{
+                fontSize: '1.1rem',
+                color: '#ddd',
+                marginBottom: '1rem'
+              }}>
+                1 SOL = 1,300,000 $ROT
+              </p>
+              
+              <div style={{
+                height: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '5px',
+                overflow: 'hidden',
+                marginBottom: '0.5rem'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: '0%',
+                  background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
+                  borderRadius: '5px'
+                }}></div>
+              </div>
+              
+              <p style={{
+                fontSize: '0.9rem',
+                color: '#aaa'
+              }}>
+                Not started yet
+              </p>
+            </div>
+            
+            {/* Phase 3 */}
+            <div style={{
+              background: 'rgba(138,43,226,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #8a2be2',
+              opacity: '0.7'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#8a2be2',
+                marginBottom: '1rem'
+              }}>
+                Phase 3
+              </h3>
+              
+              <div style={{
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '0.5rem'
+              }}>
+                15% BONUS
+              </div>
+              
+              <p style={{
+                fontSize: '1.1rem',
+                color: '#ddd',
+                marginBottom: '1rem'
+              }}>
+                1 SOL = 1,150,000 $ROT
+              </p>
+              
+              <div style={{
+                height: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '5px',
+                overflow: 'hidden',
+                marginBottom: '0.5rem'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: '0%',
+                  background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+                  borderRadius: '5px'
+                }}></div>
+              </div>
+              
+              <p style={{
+                fontSize: '0.9rem',
+                color: '#aaa'
+              }}>
+                Not started yet
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* COMMUNITY SECTION */}
+        <div id="community" style={{
+          background: 'linear-gradient(135deg, rgba(255,94,0,0.1), rgba(255,45,149,0.1))',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 94, 0, 0.3)',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #ff5e00, #ff2d95)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Join Our Community
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic'
+          }}>
+            Be part of the BrainRot revolution and connect with fellow meme enthusiasts
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '2rem',
+            flexWrap: 'wrap'
+          }}>
+            <a href="https://t.me/rottedbrains" target="_blank" rel="noopener noreferrer" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              padding: '1.5rem',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 94, 0, 0.3)',
+              minWidth: '150px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 94, 0, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem',
+                color: '#ff5e00'
+              }}>
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 8V16" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M8 12H16" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ff5e00',
+                marginBottom: '0.5rem'
+              }}>
+                Telegram
+              </h3>
+              <p style={{
+                color: '#ddd',
+                fontSize: '0.9rem'
+              }}>
+                Join our community chat
+              </p>
+            </a>
+            
+            <a href="https://x.com/kiralykaro61319?s=21" target="_blank" rel="noopener noreferrer" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              padding: '1.5rem',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 45, 149, 0.3)',
+              minWidth: '150px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 45, 149, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem',
+                color: '#ff2d95'
+              }}>
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M23 3.00005C22.0424 3.67552 20.9821 4.19216 19.86 4.53005C19.2577 3.83756 18.4573 3.34674 17.567 3.12397C16.6767 2.90121 15.7395 2.95724 14.8821 3.2845C14.0247 3.61176 13.2884 4.19445 12.773 4.95376C12.2575 5.71308 11.9877 6.61238 12 7.53005V8.53005C10.2426 8.57561 8.50127 8.18586 6.93101 7.39549C5.36074 6.60513 4.01032 5.43868 3 4.00005C3 4.00005 -1 13 8 17C5.94053 18.398 3.48716 19.099 1 19C10 24 21 19 21 7.50005C20.9991 7.2215 20.9723 6.94364 20.92 6.67005C21.9406 5.66354 22.6608 4.39276 23 3.00005Z" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ff2d95',
+                marginBottom: '0.5rem'
+              }}>
+                Twitter
+              </h3>
+              <p style={{
+                color: '#ddd',
+                fontSize: '0.9rem'
+              }}>
+                Follow for updates
+              </p>
+            </a>
+          </div>
+        </div>
+
+        {/* TEAM SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(0,219,222,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(0, 219, 222, 0.2)'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #00dbde, #8a2be2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Roadmap to Maximum Brainrot
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic'
+          }}>
+            Our path to memecoin domination and viral brainrot distribution
+          </p>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1.5rem'
+          }}>
+            {/* Q1 2025 */}
+            <div style={{
+              background: 'rgba(255,45,149,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #ff2d95',
+              textAlign: 'left'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#ff2d95'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#ff2d95',
+                    margin: 0
+                  }}>
+                    Q1 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff5e00',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    LAUNCH PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                IN PROGRESS
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Website Launch
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Presale Live
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Community Building
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Meme Creation
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q2 2025 */}
+            <div style={{
+              background: 'rgba(0,219,222,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #00dbde',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#00dbde'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8L2 22H16L22 16L16 8Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 8L12 4L2 14L6 18L16 8Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#00dbde',
+                    margin: 0
+                  }}>
+                    Q2 2025
+                  </h3>
+                  <p style={{
+                    color: '#00ff9d',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    EXCHANGE PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                COMING SOON
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  DEX Listings
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Major CEX Listings
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Influencer Partnerships
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Staking Rewards
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q3 2025 */}
+            <div style={{
+              background: 'rgba(138,43,226,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #8a2be2',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#8a2be2'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 22C13.1 22 14 21.1 14 20C14 18.9 13.1 18 12 18C10.9 18 10 18.9 10 20C10 21.1 10.9 22 12 22Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 12C22 13.1 21.1 14 20 14C18.9 14 18 13.1 18 12C18 10.9 18.9 10 20 10C21.1 10 22 10.9 22 12Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12C2 13.1 2.9 14 4 14C5.1 14 6 13.1 6 12C6 10.9 5.1 10 4 10C2.9 10 2 10.9 2 12Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#8a2be2',
+                    margin: 0
+                  }}>
+                    Q3 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    ECOSYSTEM PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                PLANNED
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Brainrot Games
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  NFT Collection
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  DAO Governance
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Mobile App
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q4 2025 */}
+            <div style={{
+              background: 'rgba(255,94,0,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #ff5e00',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#ff5e00'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3H9C8.44772 4.55228 8 6.22542 8 8C8 11.3137 10.6863 14 14 14C15.7746 14 17.4477 13.5523 19 13V14" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 21H15C15.5523 19.4477 16 17.7746 16 16C16 12.6863 13.3137 10 10 10C8.22542 10 6.55228 10.4477 5 11V10" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#ff5e00',
+                    margin: 0
+                  }}>
+                    Q4 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    DOMINATION PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #ff5e00, #ff2d95)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                FUTURE
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Global Expansion
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Top 10 Memecoin
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Metaverse Integration
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Moon Mission
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* TOKENOMICS SECTION */}
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center max-w-7xl">
+            <div className="flex flex-col items-center justify-center">
+              <h2 className="text-4xl font-bold text-center">Tokenomics</h2>
+              <p className="text-lg text-center mt-4">
+                Our tokenomics are designed to incentivize long-term growth and community participation.
+              </p>
+              <ul className="mt-8 space-y-4">
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Annual Inflation Rate: 5%</span>
+                </li>
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Community Fund: 10% of all transaction fees</span>
+                </li>
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Staking Rewards: Up to 10% per year</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* COMMUNITY SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+</
+```
+
+```
+          </div>
+        </div>
+
+        {/* TOKENOMICS SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 45, 149, 0.2)'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center'
+          }}>
+            Tokenomics
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic',
+            textAlign: 'center'
+          }}>
+            Fair distribution with focus on community and long-term growth
+          </p>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '2rem'
+          }}>
+            {/* Token Details Card */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid rgba(255, 45, 149, 0.3)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#ff2d95',
+                marginBottom: '1rem',
+                textAlign: 'center'
+              }}>
+                Token Details
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem'
+              }}>
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Token Name:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    BRAINROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Symbol:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    $ROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Total Supply:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    7,777,777,777
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Presale Price:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    1 SOL = 1M $ROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Launch Price:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    1 SOL = 500K $ROT
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Distribution Card */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid rgba(138, 43, 226, 0.3)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#8a2be2',
+                marginBottom: '1rem',
+                textAlign: 'center'
+              }}>
+                Distribution
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Presale
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      2.59B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    33.3%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Liquidity
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      1.94B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#00dbde',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    25%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Marketing
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      1.56B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#ff5e00',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    20%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Team
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      777M $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#8a2be2',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    10%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Development
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      910M $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#00ff9d',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    11.7%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SCARCITY INDICATOR */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,94,0,0.2), rgba(255,45,149,0.2))',
+          borderRadius: '15px',
+          padding: '1.5rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 94, 0, 0.3)'
+        }}>
+          <p style={{
+            fontSize: '1.3rem',
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            color: '#ff5e00'
+          }}>
+            🚨 ONLY 12.8 SOL LEFT!
+          </p>
+          <p style={{
+            fontSize: '1rem',
+            color: '#ddd',
+            marginBottom: '1rem'
+          }}>
+            Once this hardcap is reached, the presale will close immediately.
+          </p>
+          <div style={{
+            height: '20px',
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '10px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              height: '100%',
+              width: '87%',
+              background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+              borderRadius: '10px'
+            }}></div>
+          </div>
+          <p style={{
+            fontSize: '0.9rem',
+            color: '#aaa',
+            marginTop: '0.5rem'
+          }}>
+            87% SOLD - Almost full!
+          </p>
+        </div>
+
+        {/* FAQ SECTION */}
+        <div style={{
+          background: '#000000',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center'
+          }}>
+            Frequently Asked Questions
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic',
+            textAlign: 'center'
+          }}>
+            Everything you need to know about $BRAINROT
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}>
+            {/* FAQ Item 1 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 45, 149, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#ff2d95',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>What is $BRAINROT?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(255, 45, 149, 0.2)'
+                }}>
+                  <p>$BRAINROT is the ultimate memecoin designed to give you maximum brainrot. It's a community-driven token on Solana with 0% tax, 95% liquidity locked, and built for viral growth and meme culture domination.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 2 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0, 219, 222, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#00dbde',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>How do I buy $ROT tokens?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(0, 219, 222, 0.2)'
+                }}>
+                  <p>You can buy $ROT directly on our website using Phantom wallet or manual SOL transfer. During presale, you get 50% bonus tokens! Simply connect your wallet, enter the SOL amount, and receive your tokens instantly.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 3 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(138, 43, 226, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#8a2be2',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>What makes $BRAINROT different?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(138, 43, 226, 0.2)'
+                }}>
+                  <p>Unlike other memecoins, $BRAINROT has 0% buy/sell tax, 95% locked liquidity, instant token delivery, and a vibrant community. We're building an entire ecosystem with games, NFTs, and real utility while maintaining maximum meme energy.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 4 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 94, 0, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#ff5e00',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>Is $BRAINROT safe?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(255, 94, 0, 0.2)'
+                }}>
+                  <p>Yes! Our smart contract is audited, 95% of liquidity is permanently locked, there's 0% tax, and the team tokens are vested. We're fully transparent with our tokenomics and security measures.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 5 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0, 255, 157, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#00ff9d',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>When will $ROT be listed on exchanges?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(0, 255, 157, 0.2)'
+                }}>
+                  <p>We're planning DEX listings in Q2 2025 followed by major CEX listings. Presale participants get the best price before public launch. Join our Telegram for the latest updates on exchange listings.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 6 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 45, 149, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#ff2d95',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>What's the presale bonus?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(255, 45, 149, 0.2)'
+                }}>
+                  <p>During Phase 1 presale, you get 50% bonus tokens! So if you buy 1M $ROT, you receive 1.5M $ROT total. This bonus decreases in later phases, so early supporters get the best deal.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 7 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0, 219, 222, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#00dbde',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>How can I join the community?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(0, 219, 222, 0.2)'
+                }}>
+                  <p>Join our active Telegram channel, Discord server, and follow us on X (Twitter). We have daily discussions, meme contests, exclusive alpha, and regular community events. Links are available on our website.</p>
+                </div>
+              </details>
+            </div>
+            
+            {/* FAQ Item 8 */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(138, 43, 226, 0.3)',
+              overflow: 'hidden'
+            }}>
+              <details>
+                <summary style={{
+                  padding: '1.2rem',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: '#8a2be2',
+                  cursor: 'pointer',
+                  listStyle: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>What's the roadmap for $BRAINROT?</span>
+                  <span style={{ fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <div style={{
+                  padding: '0 1.2rem 1.2rem',
+                  color: '#ddd',
+                  lineHeight: '1.6',
+                  borderTop: '1px solid rgba(138, 43, 226, 0.2)'
+                }}>
+                  <p>We're building a complete ecosystem: Q1 presale and community building, Q2 exchange listings, Q3 games and NFTs, Q4 global expansion and metaverse integration. Check our roadmap section for detailed milestones.</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div style={{
+          textAlign: 'center',
+          padding: '2rem',
+          color: '#777',
+          fontSize: '0.9rem',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          marginTop: '2rem'
+        }}>
+          <p>© 2025 $BRAINROT - The Ultimate Memecoin Experience</p>
+          <p style={{ marginTop: '0.5rem' }}>
+            Disclaimer: This is a meme token with no intrinsic value. Invest only what you can afford to lose.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
