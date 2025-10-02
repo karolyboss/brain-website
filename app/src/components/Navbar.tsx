@@ -98,8 +98,9 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="nav-container">
         <div>
-          <Link href="/" className="logo-link">
-            $ROT BrainRot
+          <Link href="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <img src="/logo.png" alt="BrainRot Logo" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+            <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>$ROT</span>
           </Link>
         </div>
 

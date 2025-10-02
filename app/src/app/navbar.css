@@ -77,6 +77,10 @@
     padding: 1rem;
   }
 
+  .nav-container {
+    position: relative;
+  }
+
   .mobile-menu-button {
     display: flex;
     align-items: center;
@@ -87,6 +91,10 @@
     border: none;
     cursor: pointer;
     z-index: 20;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .mobile-menu-button span,

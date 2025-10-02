@@ -350,6 +350,133 @@ export default function Home() {
           borderRadius: '15px',
           padding: '2rem',
           marginBottom: '2rem',
+          border: '1px solid rgba(255, 94, 0, 0.3)',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #ff5e00, #ff2d95)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            🚀 Join Our Community First!
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic'
+          }}>
+            ⚠️ Before buying, join our Telegram & follow us on X to unlock your purchase!
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '2rem',
+            flexWrap: 'wrap'
+          }}>
+            <a href="https://t.me/rottedbrains" target="_blank" rel="noopener noreferrer" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              padding: '1.5rem',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 94, 0, 0.3)',
+              minWidth: '150px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 94, 0, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem',
+                color: '#ff5e00'
+              }}>
+                📱
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#4d94ff',
+                marginBottom: '0.5rem'
+              }}>
+                Telegram
+              </h3>
+              <p style={{
+                color: '#4d94ff',
+                fontSize: '0.9rem'
+              }}>
+                Join our community chat
+              </p>
+            </a>
+            
+            <a href="https://x.com/kiralykaro61319?s=21" target="_blank" rel="noopener noreferrer" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              padding: '1.5rem',
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 45, 149, 0.3)',
+              minWidth: '150px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 45, 149, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem',
+                color: '#ff2d95'
+              }}>
+                𝕏
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ffffff',
+                marginBottom: '0.5rem'
+              }}>
+                X
+              </h3>
+              <p style={{
+                color: '#ffffff',
+                fontSize: '0.9rem'
+              }}>
+                Follow for updates
+              </p>
+            </a>
+          </div>
+        </div>
+
+        {/* BUY $ROT TOKEN SECTION */}
+        <div style={{
+          background: 'rgba(10, 5, 20, 0.9)',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
           border: '1px solid rgba(255, 45, 149, 0.7)',
           boxShadow: '0 0 20px rgba(255, 45, 149, 0.3)'
         }}>
@@ -1598,133 +1725,6 @@ export default function Home() {
         </div>
 
         <WhyChooseRot />
-
-        {/* COMMUNITY SECTION */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
-          borderRadius: '15px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          border: '1px solid rgba(255, 94, 0, 0.3)',
-          textAlign: 'center'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            background: 'linear-gradient(90deg, #ff5e00, #ff2d95)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            Join Our Community
-          </h2>
-          
-          <p style={{
-            fontSize: '1.2rem',
-            color: '#ddd',
-            marginBottom: '2rem',
-            fontStyle: 'italic'
-          }}>
-            Be part of the BrainRot revolution and connect with fellow meme enthusiasts
-          </p>
-          
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '2rem',
-            flexWrap: 'wrap'
-          }}>
-            <a href="https://t.me/rottedbrains" target="_blank" rel="noopener noreferrer" style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textDecoration: 'none',
-              color: '#fff',
-              padding: '1.5rem',
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 94, 0, 0.3)',
-              minWidth: '150px',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 94, 0, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}>
-              <div style={{
-                fontSize: '3rem',
-                marginBottom: '1rem',
-                color: '#ff5e00'
-              }}>
-
-              </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#4d94ff',
-                marginBottom: '0.5rem'
-              }}>
-                Telegram
-              </h3>
-              <p style={{
-                color: '#4d94ff',
-                fontSize: '0.9rem'
-              }}>
-                Join our community chat
-              </p>
-            </a>
-            
-            <a href="https://x.com/kiralykaro61319?s=21" target="_blank" rel="noopener noreferrer" style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textDecoration: 'none',
-              color: '#fff',
-              padding: '1.5rem',
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 45, 149, 0.3)',
-              minWidth: '150px',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 45, 149, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}>
-              <div style={{
-                fontSize: '3rem',
-                marginBottom: '1rem',
-                color: '#ff2d95'
-              }}>
-
-              </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ffffff',
-                marginBottom: '0.5rem'
-              }}>
-                X
-              </h3>
-              <p style={{
-                color: '#ffffff',
-                fontSize: '0.9rem'
-              }}>
-                Follow for updates
-              </p>
-            </a>
-          </div>
-        </div>
 
         {/* SCARCITY INDICATOR */}
         <div style={{
