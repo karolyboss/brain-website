@@ -110,26 +110,30 @@ export default function Home() {
 
     try {
       setIsProcessing(true);
-      setTransactionStatus('Checking wallet balance...');
-
-      // Check wallet balance
-      const balance = await connection.getBalance(publicKey);
-      if (balance < solAmount * LAMPORTS_PER_SOL) {
-        setTransactionStatus(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
-        toast.error(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
-        setIsProcessing(false);
-        return;
-      }
       
-      setTransactionStatus('Preparing transaction...');
-      
-      // Check social verification
+      // Check social verification first
       const socialVerified = localStorage.getItem('socialVerified') === 'true';
       if (!socialVerified) {
         setTransactionStatus('Please join our Telegram and follow us on X to participate.');
         toast.error('Social verification required!');
         setIsProcessing(false);
         return;
+      }
+
+      setTransactionStatus('Preparing transaction...');
+      
+      // Optional balance check - skip if it fails (Phantom will handle insufficient funds)
+      try {
+        const balance = await connection.getBalance(publicKey);
+        if (balance < solAmount * LAMPORTS_PER_SOL) {
+          setTransactionStatus(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
+          toast.error(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
+          setIsProcessing(false);
+          return;
+        }
+      } catch (balanceError) {
+        console.warn('Balance check failed, proceeding anyway:', balanceError);
+        // Continue with transaction - Phantom will show error if insufficient funds
       }
 
       setTransactionStatus('Opening Phantom wallet...');
