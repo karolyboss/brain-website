@@ -192,6 +192,13 @@ export default function DegenDodge() {
     return POWER_UPS[0]; // Fallback to first power-up
   };
 
+  const playerRef = useRef<Player>(player);
+
+  // Keep playerRef in sync with player state
+  useEffect(() => {
+    playerRef.current = player;
+  }, [player]);
+
   const updateGame = (deltaTime: number) => {
     setPlayer(prevPlayer => {
       // Update active effects
@@ -199,11 +206,11 @@ export default function DegenDodge() {
       const activeEffects = prevPlayer.activeEffects.filter(
         effect => effect.endTime > now
       );
-      
+
       const isInvincible = activeEffects.some(e => e.type === 'invincible');
       const speedMultiplier = activeEffects.some(e => e.type === 'speed') ? 1.8 : 1;
       let scoreMultiplier = 1;
-      
+
       activeEffects.forEach(effect => {
         if (effect.type.endsWith('x')) {
           scoreMultiplier = parseFloat(effect.type.replace('x', ''));
@@ -227,16 +234,9 @@ export default function DegenDodge() {
         }))
         .filter(obj => obj.y < GAME_HEIGHT + 50); // Remove objects that are off-screen
 
-      // Check for collisions
-      const playerObj = {
-        x: player.x,
-        y: player.y,
-        width: player.width,
-        height: player.height
-      };
-
+      // Check for collisions using current player state
       newObjects.forEach(obj => {
-        if (checkCollision(playerObj, obj)) {
+        if (checkCollision(playerRef.current, obj)) {
           handleCollision(obj);
           obj.y = GAME_HEIGHT + 100; // Move collided object off-screen to be removed
         }
@@ -256,6 +256,8 @@ export default function DegenDodge() {
   };
 
   const handleCollision = (obj: GameObject) => {
+    const currentPlayer = playerRef.current;
+
     if (obj.type === 'rot') {
       // Collect ROT token
       const value = obj.value || 1;
@@ -264,19 +266,21 @@ export default function DegenDodge() {
         rotBalance: prev.rotBalance + value * prev.multiplier,
         score: prev.score + 10 * prev.multiplier
       }));
-      
+
       // Play sound or show effect
       playSound('collect');
-    } 
-    else if (obj.type === 'obstacle' && !player.isInvincible) {
+    }
+    else if (obj.type === 'obstacle' && !currentPlayer.isInvincible) {
       // Hit by obstacle
       const value = obj.value || -10;
+      const nextBalance = Math.max(0, currentPlayer.rotBalance + value);
+
       setPlayer(prev => ({
         ...prev,
         rotBalance: Math.max(0, prev.rotBalance + value),
         isInvincible: true
       }));
-      
+
       // Apply obstacle effect
       if (obj.effect === 'slow') {
         // Slow down player temporarily
@@ -292,15 +296,15 @@ export default function DegenDodge() {
           // Reset controls
         }, 3000);
       }
-      
+
       playSound('hit');
-      
-      // Check for game over
-      if (player.rotBalance + value <= 0) {
+
+      // Check for game over using current state
+      if (nextBalance <= 0) {
         setGameOver(true);
-        if (player.score > highScore) {
-          setHighScore(player.score);
-          localStorage.setItem('degenDodgeHighScore', player.score.toString());
+        if (currentPlayer.score > highScore) {
+          setHighScore(currentPlayer.score);
+          localStorage.setItem('degenDodgeHighScore', currentPlayer.score.toString());
         }
       }
     }
@@ -308,11 +312,11 @@ export default function DegenDodge() {
       // Apply power-up effect
       const effectType = obj.effect || '';
       const effectDuration = POWER_UPS.find(p => p.effect === effectType)?.duration || 5000;
-      
+
       setPlayer(prev => {
         const existingEffectIndex = prev.activeEffects.findIndex(e => e.type === effectType);
         const newEffects = [...prev.activeEffects];
-        
+
         if (existingEffectIndex >= 0) {
           newEffects[existingEffectIndex] = {
             type: effectType,
@@ -324,13 +328,13 @@ export default function DegenDodge() {
             endTime: Date.now() + effectDuration
           });
         }
-        
+
         return {
           ...prev,
           activeEffects: newEffects
         };
       });
-      
+
       playSound('powerup');
     }
   };
