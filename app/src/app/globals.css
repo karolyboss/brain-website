@@ -114,7 +114,6 @@ body {
   font-weight: bold;
   color: #ff2d95;
 }
-
 .countdown-text {
   font-size: 0.8rem;
   color: #aaa;
@@ -151,6 +150,30 @@ body {
   .urgent-badge {
     font-size: 1rem;
     padding: 6px 16px;
+  }
+
+  /* Mobile grid fixes */
+  .features-grid,
+  .presale-phases-grid,
+  .memes-grid,
+  .why-choose-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .buy-token-form,
+  .info-panel {
+    min-width: 100%;
+    padding: 1rem;
+  }
+
+  .buy-token-title {
+    font-size: 2rem !important;
+  }
+
+  .buy-token-form-title,
+  .info-panel-title {
+    font-size: 1.5rem;
   }
 }
 
