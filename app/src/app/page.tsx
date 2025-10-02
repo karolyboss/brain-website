@@ -1597,6 +1597,9 @@ export default function Home() {
         {/* WHY CHOOSE $ROT SECTION */}
         <div className="why-choose-container text-center" style={{
           padding: '3rem 2rem',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
             fontSize: '2.5rem',
             fontWeight: 'bold',
             marginBottom: '1rem',
