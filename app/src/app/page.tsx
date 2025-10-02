@@ -10,9 +10,9 @@ import { toast } from 'react-hot-toast';
 export default function Home() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({
-    days: 5,
-    hours: 6,
-    minutes: 0,
+    days: 4,
+    hours: 11,
+    minutes: 6,
     seconds: 0
   });
 
@@ -30,11 +30,11 @@ export default function Home() {
   const { publicKey, sendTransaction, connected } = useWallet();
   const { connection } = useConnection();
 
-  // Initialize countdown timer (5 days 6 hours from now)
+  // Initialize countdown timer (4 days 11 hours 6 minutes from now)
   useEffect(() => {
-    // Set the end time to 5 days and 6 hours from the initial load
+    // Set the end time to 4 days, 11 hours, and 6 minutes from the initial load
     const now = new Date();
-    const endTime = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000) + (6 * 60 * 60 * 1000)); // 5 days 6 hours from now
+    const endTime = new Date(now.getTime() + (4 * 24 * 60 * 60 * 1000) + (11 * 60 * 60 * 1000) + (6 * 60 * 1000)); // 4 days 11 hours 6 minutes from now
     
     const calculateTimeLeft = () => {
       const now = new Date();
