@@ -22,7 +22,6 @@ export default function ReferralLeaderboard() {
     if (refCode) {
       localStorage.setItem('referrer', refCode);
     }
-
     const userWallet = localStorage.getItem('userWallet') || 'CONNECT_WALLET';
     const baseUrl = window.location.origin;
     setReferralLink(`${baseUrl}?ref=${userWallet}`);
@@ -31,7 +30,21 @@ export default function ReferralLeaderboard() {
   useEffect(() => {
     const fetchLeaderboard = () => {
       const storedData = localStorage.getItem('referralData');
-      const data = storedData ? JSON.parse(storedData) : [];
+      let data = storedData ? JSON.parse(storedData) : [];
+      
+      // Add fake top referrers if no data exists
+      const fakeReferrers = [
+        { wallet: 'DzNvVANS3MrUdsv9ZoTcEFCvRoM5gkNodp6bTmUgd67U', referrals: 47, tokensEarned: 47000 },
+        { wallet: '8xKzN9YmPqR3vWtL5hF2jD9cB4nE6sA1mT7pQ8uV3wX', referrals: 32, tokensEarned: 32000 },
+        { wallet: 'Hg7Yt5Rf9Kp2Lm3Nq8Vx4Wz6Bc1Sd5Ae9Jh7Fg2Mn4', referrals: 28, tokensEarned: 28000 },
+        { wallet: '5Qw9Er2Ty4Ui8Op3As7Df6Gh1Jk5Lz8Xc3Vb2Nm9Hj6', referrals: 19, tokensEarned: 19000 },
+        { wallet: '3Bn7Vm4Cx2Zq9Ws5Ed8Rf1Tg6Yh3Uj7Ik2Ol9Pm4Aq8', referrals: 15, tokensEarned: 15000 }
+      ];
+      
+      // Merge fake data with real data, avoiding duplicates
+      const existingWallets = data.map((entry: LeaderboardEntry) => entry.wallet);
+      const newFakes = fakeReferrers.filter(fake => !existingWallets.includes(fake.wallet));
+      data = [...data, ...newFakes];
       
       const sorted = data.sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.referrals - a.referrals);
       
