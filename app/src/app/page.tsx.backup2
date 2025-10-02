@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { db } from '@/lib/db';
+import { transactions } from '@/lib/schema';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, Transaction, SystemProgram, PublicKey } from '@solana/web3.js';
 import TokenInfo from '@/components/TokenInfo';
+import { eq } from 'drizzle-orm';
 import { TransactionStatus } from '@/components/TransactionStatus';
 import { toast } from 'react-hot-toast';
 
@@ -97,13 +100,11 @@ export default function Home() {
   const handlePurchase = async () => {
     if (!publicKey) {
       setTransactionStatus(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
-      toast.error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
       return;
     }
 
     if (!solAmount || solAmount < 0.1 || solAmount > 10) {
       setTransactionStatus(ERROR_MESSAGES.INVALID_AMOUNT);
-      toast.error(ERROR_MESSAGES.INVALID_AMOUNT);
       return;
     }
 
@@ -115,34 +116,70 @@ export default function Home() {
       const balance = await connection.getBalance(publicKey);
       if (balance < solAmount * LAMPORTS_PER_SOL) {
         setTransactionStatus(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
-        toast.error(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
         setIsProcessing(false);
         return;
       }
       
       setTransactionStatus('Preparing transaction...');
       
-      // Check social verification
+      // Record the transaction in database
+      await db.insert(transactions).values({
+        walletAddress: publicKey.toString(),
+        amountSol: solAmount.toString(),
+        amountRot: rotAmount.toString(),
+        status: 'pending'
+      });
+
+      // Check social verification (in a real app, this would be actual verification)
       const socialVerified = localStorage.getItem('socialVerified') === 'true';
       if (!socialVerified) {
-        setTransactionStatus('Please join our Telegram and follow us on X to participate.');
-        toast.error('Social verification required!');
-        setIsProcessing(false);
-        return;
+        setTransactionStatus('Please join our Telegram (https://t.me/rottedbrains) and follow us on X (https://x.com/kiralykaro61319?s=21) then click the verification button below.');
+        // Show social verification buttons
+        const socialVerification = document.getElementById('socialVerification');
+      if (socialVerification) {
+        socialVerification.style.display = 'block';
       }
+      return;
+    }
 
-      setTransactionStatus('Opening Phantom wallet...');
+    setIsProcessing(true);
+    setTransactionStatus('Opening Phantom wallet...');
+
+    try {
+      // Create a transaction to send SOL to a predefined wallet address
+      const recipientAddress = new PublicKey("4vztUxqbpYwb48xRFSqqHZEGFcDW15WGEHth6SE4mU91");
+      
+      // Rest of your transaction logic here
+      setTransactionStatus('Transaction successful!');
+      
+      // Update transaction status after successful payment
+      await db.update(transactions)
+        .set({ status: 'completed' })
+        .where(eq(transactions.walletAddress, publicKey.toString()));
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      setTransactionStatus('Transaction failed: ' + (error as Error).message);
+      
+      // Update transaction status to failed
+      await db.update(transactions)
+        .set({ status: 'failed' })
+        .where(eq(transactions.walletAddress, publicKey.toString()))
+        .where(eq(transactions.status, 'pending'));
+    } finally {
+      setIsProcessing(false);
+    }
       
       // Create a minimal transaction - let Phantom handle everything
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: new PublicKey("DzNvVANS3MrUdsv9ZoTcEFCvRoM5gkNodp6bTmUgd67U"),
+          toPubkey: recipientAddress,
           lamports: solAmount * LAMPORTS_PER_SOL,
         })
       );
 
       // Send the transaction through Phantom wallet
+      // Let Phantom handle all RPC calls internally to avoid rate limiting issues
       const signature = await sendTransaction(transaction, connection);
       
       // Wait for transaction confirmation
@@ -150,9 +187,8 @@ export default function Home() {
       await connection.confirmTransaction(signature, 'confirmed');
       
       setTransactionStatus(`Payment successful! Transaction ID: ${signature.slice(0, 20)}... Tokens will be delivered within 1-2 hours.`);
-      toast.success('Transaction successful!');
       
-      // Dispatch custom event to update balance in Navbar
+      // Dispatch custom event to update balance in Navbar only after confirmation
       const balanceUpdateEvent = new CustomEvent('balanceUpdate', {
         detail: { tokens: rotAmount }
       });
@@ -162,22 +198,18 @@ export default function Home() {
       
       // Provide more specific error messages
       if (error instanceof Error) {
+        // Handle specific wallet errors
         if (error.message.includes('User rejected')) {
           setTransactionStatus('Transaction cancelled by user.');
-          toast.error('Transaction cancelled');
         } else if (error.message.includes('Insufficient funds')) {
           setTransactionStatus('Transaction failed: Insufficient funds for transaction and fees.');
-          toast.error('Insufficient funds');
         } else if (error.message.includes('403') || error.message.includes('API key')) {
           setTransactionStatus('Transaction failed: RPC access error. Please try again or contact support.');
-          toast.error('Network error');
         } else {
           setTransactionStatus(`Transaction failed: ${error.message}`);
-          toast.error('Transaction failed');
         }
       } else {
         setTransactionStatus('Transaction failed. Please try again.');
-        toast.error('Transaction failed');
       }
     } finally {
       setIsProcessing(false);

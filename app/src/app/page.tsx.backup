@@ -1,11 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { LAMPORTS_PER_SOL, Transaction, SystemProgram, PublicKey } from '@solana/web3.js';
-import TokenInfo from '@/components/TokenInfo';
-import { TransactionStatus } from '@/components/TransactionStatus';
-import { toast } from 'react-hot-toast';
 
 export default function Home() {
   // Countdown timer state
@@ -15,20 +10,6 @@ export default function Home() {
     minutes: 0,
     seconds: 0
   });
-
-  // SOL amount state
-  const [solAmount, setSolAmount] = useState(1.0);
-  
-  // ROT amount calculation (1 SOL = 1,500,000 ROT with 50% bonus)
-  const rotAmount = Math.floor(solAmount * 1500000);
-  
-  // Transaction status
-  const [transactionStatus, setTransactionStatus] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  // Wallet and connection hooks
-  const { publicKey, sendTransaction, connected } = useWallet();
-  const { connection } = useConnection();
 
   // Initialize countdown timer (5 days 6 hours from now)
   useEffect(() => {
@@ -61,128 +42,6 @@ export default function Home() {
 
     return () => clearInterval(timer);
   }, []);
-
-  // Format number with commas
-  const formatNumber = (num: number) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  // Handle slider change
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    setSolAmount(value);
-  };
-
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = parseFloat(e.target.value);
-    if (isNaN(value)) value = 0.1;
-    if (value < 0.1) value = 0.1;
-    if (value > 10) value = 10;
-    setSolAmount(value);
-  };
-
-  // Error messages map
-  const ERROR_MESSAGES = {
-    WALLET_NOT_CONNECTED: 'Please connect your wallet first',
-    INVALID_AMOUNT: 'Please enter a valid SOL amount (0.1 - 10 SOL)',
-    INSUFFICIENT_BALANCE: 'Insufficient SOL balance in your wallet',
-    RPC_ERROR: 'Network connection error. Please try again',
-    SOCIAL_VERIFICATION: 'Please join our Telegram and follow us on X to participate',
-    TRANSACTION_FAILED: 'Transaction failed. Please try again',
-    USER_REJECTED: 'Transaction was rejected by user'
-  };
-
-  // Handle purchase with Phantom wallet
-  const handlePurchase = async () => {
-    if (!publicKey) {
-      setTransactionStatus(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
-      toast.error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
-      return;
-    }
-
-    if (!solAmount || solAmount < 0.1 || solAmount > 10) {
-      setTransactionStatus(ERROR_MESSAGES.INVALID_AMOUNT);
-      toast.error(ERROR_MESSAGES.INVALID_AMOUNT);
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-      setTransactionStatus('Checking wallet balance...');
-
-      // Check wallet balance
-      const balance = await connection.getBalance(publicKey);
-      if (balance < solAmount * LAMPORTS_PER_SOL) {
-        setTransactionStatus(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
-        toast.error(ERROR_MESSAGES.INSUFFICIENT_BALANCE);
-        setIsProcessing(false);
-        return;
-      }
-      
-      setTransactionStatus('Preparing transaction...');
-      
-      // Check social verification
-      const socialVerified = localStorage.getItem('socialVerified') === 'true';
-      if (!socialVerified) {
-        setTransactionStatus('Please join our Telegram and follow us on X to participate.');
-        toast.error('Social verification required!');
-        setIsProcessing(false);
-        return;
-      }
-
-      setTransactionStatus('Opening Phantom wallet...');
-      
-      // Create a minimal transaction - let Phantom handle everything
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey("DzNvVANS3MrUdsv9ZoTcEFCvRoM5gkNodp6bTmUgd67U"),
-          lamports: solAmount * LAMPORTS_PER_SOL,
-        })
-      );
-
-      // Send the transaction through Phantom wallet
-      const signature = await sendTransaction(transaction, connection);
-      
-      // Wait for transaction confirmation
-      setTransactionStatus('Confirming transaction...');
-      await connection.confirmTransaction(signature, 'confirmed');
-      
-      setTransactionStatus(`Payment successful! Transaction ID: ${signature.slice(0, 20)}... Tokens will be delivered within 1-2 hours.`);
-      toast.success('Transaction successful!');
-      
-      // Dispatch custom event to update balance in Navbar
-      const balanceUpdateEvent = new CustomEvent('balanceUpdate', {
-        detail: { tokens: rotAmount }
-      });
-      window.dispatchEvent(balanceUpdateEvent);
-    } catch (error: unknown) {
-      console.error('Transaction failed:', error);
-      
-      // Provide more specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes('User rejected')) {
-          setTransactionStatus('Transaction cancelled by user.');
-          toast.error('Transaction cancelled');
-        } else if (error.message.includes('Insufficient funds')) {
-          setTransactionStatus('Transaction failed: Insufficient funds for transaction and fees.');
-          toast.error('Insufficient funds');
-        } else if (error.message.includes('403') || error.message.includes('API key')) {
-          setTransactionStatus('Transaction failed: RPC access error. Please try again or contact support.');
-          toast.error('Network error');
-        } else {
-          setTransactionStatus(`Transaction failed: ${error.message}`);
-          toast.error('Transaction failed');
-        }
-      } else {
-        setTransactionStatus('Transaction failed. Please try again.');
-        toast.error('Transaction failed');
-      }
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <div style={{ 
@@ -415,7 +274,7 @@ export default function Home() {
                     color: '#ff2d95',
                     fontSize: '1.2rem'
                   }}>
-                    {solAmount.toFixed(1)} SOL
+                    <span id="solAmountDisplay">1.0</span> SOL
                   </span>
                 </div>
                 
@@ -423,11 +282,11 @@ export default function Home() {
                 <div style={{ marginBottom: '1rem' }}>
                   <input 
                     type="number" 
+                    id="solAmountInput"
                     min="0.1" 
                     max="10" 
                     step="0.1" 
-                    value={solAmount}
-                    onChange={handleInputChange}
+                    defaultValue="1" 
                     placeholder="Enter SOL amount"
                     style={{
                       width: '100%',
@@ -444,11 +303,11 @@ export default function Home() {
                 {/* Slider */}
                 <input 
                   type="range" 
+                  id="solAmountSlider"
                   min="0.1" 
                   max="10" 
                   step="0.1" 
-                  value={solAmount}
-                  onChange={handleSliderChange}
+                  defaultValue="1" 
                   style={{
                     width: '100%',
                     height: '8px',
@@ -460,10 +319,10 @@ export default function Home() {
                 />
                 
                 {/* Custom slider thumb styling */}
-                <style>
-                  {`
+                <style dangerouslySetInnerHTML={{
+                  __html: `
                     input[type="range"]::-webkit-slider-thumb {
-                      -webkit-appearance: none;
+                      WebkitAppearance: none;
                       appearance: none;
                       width: 20px;
                       height: 20px;
@@ -479,8 +338,8 @@ export default function Home() {
                       cursor: pointer;
                       border: none;
                     }
-                  `}
-                </style>
+                  `
+                }}></style>
                 
                 <div style={{
                   display: 'flex',
@@ -518,7 +377,7 @@ export default function Home() {
                     color: 'transparent',
                     backgroundClip: 'text'
                   }}>
-                    {formatNumber(rotAmount)} ROT
+                    <span id="rotAmountDisplay">1,500,000</span> ROT
                   </div>
                   <div style={{ 
                     color: '#aaa',
@@ -529,152 +388,24 @@ export default function Home() {
                 </div>
               </div>
               
-              {/* Social Verification - Hidden by default, shown when social verification is needed */}
-              <div id="socialVerification" style={{
-                marginTop: '1rem',
-                padding: '1rem',
-                background: 'rgba(138,43,226,0.1)',
-                borderRadius: '10px',
-                border: '1px solid rgba(138,43,226,0.3)',
-                display: 'none'
-              }}>
-                <h4 style={{
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  color: '#8a2be2',
-                  marginBottom: '1rem',
-                  textAlign: 'center'
-                }}>
-                  Social Verification Required
-                </h4>
-                
-                <p style={{
-                  color: '#ddd',
-                  marginBottom: '1rem',
-                  lineHeight: '1.6',
-                  textAlign: 'center'
-                }}>
-                  Please join our community to proceed with your purchase:
-                </p>
-                
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  alignItems: 'center'
-                }}>
-                  <a 
-                    href="https://t.me/rottedbrains" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      padding: '0.8rem 1.5rem',
-                      background: 'linear-gradient(90deg, #229ED9, #1e88e5)',
-                      color: 'white',
-                      textDecoration: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => {
-                      // In a real app, you would track this action
-                      console.log('Telegram link clicked');
-                    }}
-                  >
-                    <span>Join Telegram</span>
-                  </a>
-                  
-                  <a 
-                    href="https://x.com/kiralykaro61319?s=21" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      padding: '0.8rem 1.5rem',
-                      background: 'linear-gradient(90deg, #1DA1F2, #0d8bd9)',
-                      color: 'white',
-                      textDecoration: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => {
-                      // In a real app, you would track this action
-                      console.log('X link clicked');
-                    }}
-                  >
-                    <span>Follow on X</span>
-                  </a>
-                  
-                  <button
-                    onClick={() => {
-                      // Mark as verified in localStorage
-                      localStorage.setItem('socialVerified', 'true');
-                      // Hide the social verification section
-                      const socialVerification = document.getElementById('socialVerification');
-                      if (socialVerification) {
-                        socialVerification.style.display = 'none';
-                      }
-                      // Clear the transaction status message
-                      setTransactionStatus('');
-                    }}
-                    style={{
-                      padding: '0.8rem 1.5rem',
-                      background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      marginTop: '0.5rem'
-                    }}
-                  >
-                    I've Completed These Steps
-                  </button>
-                </div>
-              </div>
-              
               {/* Buy Button */}
-              <button 
-                onClick={handlePurchase}
-                disabled={isProcessing || !connected}
-                style={{
-                  width: '100%',
-                  padding: '1rem',
-                  background: isProcessing || !connected 
-                    ? 'linear-gradient(90deg, #666, #888)' 
-                    : 'linear-gradient(90deg, #ff2d95, #8a2be2)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  cursor: isProcessing || !connected ? 'not-allowed' : 'pointer',
-                  transition: 'transform 0.2s',
-                  opacity: isProcessing || !connected ? 0.7 : 1
-                }}
-                onMouseDown={(e) => {
-                  if (!isProcessing && connected) {
-                    e.currentTarget.style.transform = 'scale(0.98)';
-                  }
-                }}
-                onMouseUp={(e) => {
-                  if (!isProcessing && connected) {
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isProcessing && connected) {
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }
-                }}
+              <button style={{
+                width: '100%',
+                padding: '1rem',
+                background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'transform 0.2s'
+              }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
-                {isProcessing ? 'Processing...' : connected ? `Buy ${formatNumber(rotAmount)} $ROT` : 'Connect Wallet to Buy'}
+                Buy with Phantom Wallet
               </button>
               
               {/* Transaction Status */}
@@ -684,10 +415,10 @@ export default function Home() {
                 borderRadius: '8px',
                 background: 'rgba(0,0,0,0.2)',
                 textAlign: 'center',
-                color: transactionStatus.includes('successful') ? '#00ff9d' : transactionStatus.includes('failed') ? '#ff5e00' : '#00dbde',
-                display: transactionStatus ? 'block' : 'none'
+                color: '#ff5e00',
+                display: 'none' // Hidden by default
               }}>
-                {transactionStatus}
+                Processing transaction...
               </div>
               
               {/* Manual Payment - Hidden by default, shown only on error */}
@@ -697,7 +428,7 @@ export default function Home() {
                 background: 'rgba(255,94,0,0.1)',
                 borderRadius: '10px',
                 border: '1px solid rgba(255,94,0,0.3)',
-                display: transactionStatus.includes('failed') ? 'block' : 'none'
+                display: 'none' // Hidden by default
               }}>
                 <h4 style={{
                   fontSize: '1.3rem',
@@ -714,7 +445,7 @@ export default function Home() {
                   marginBottom: '1rem',
                   lineHeight: '1.6'
                 }}>
-                  If you&#39;re experiencing issues with the Phantom wallet integration, you can manually send SOL to this address:
+                  If you're experiencing issues with the Phantom wallet integration, you can manually send SOL to this address:
                 </p>
                 
                 <div style={{
@@ -739,7 +470,6 @@ export default function Home() {
                   lineHeight: '1.6'
                 }}>
                   After sending, please contact support with your transaction ID. Your tokens will be delivered manually within 1-2 hours.
-                  Make sure you have joined our Telegram group (https://t.me/rottedbrains) and followed us on X (https://x.com/kiralykaro61319?s=21) before purchasing.
                 </p>
               </div>
             </div>
@@ -809,7 +539,7 @@ export default function Home() {
                     <br />
                     2. Select SOL amount (0.1 - 10 SOL)
                     <br />
-                    3. Click &#34;Buy with Phantom Wallet&#34;
+                    3. Click "Buy with Phantom Wallet"
                     <br />
                     4. Confirm transaction in wallet
                   </p>
@@ -838,21 +568,21 @@ export default function Home() {
         </div>
 
         {/* Add JavaScript for slider and input synchronization */}
-        <script>
-          {`
+        <script dangerouslySetInnerHTML={{
+          __html: `
             (function() {
               // Wait for DOM to be fully loaded
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTokenCalculator);
+              } else {
+                initTokenCalculator();
+              }
+              
               function initTokenCalculator() {
                 const slider = document.getElementById('solAmountSlider');
                 const input = document.getElementById('solAmountInput');
                 const solDisplay = document.getElementById('solAmountDisplay');
                 const rotDisplay = document.getElementById('rotAmountDisplay');
-                
-                // Check if all elements exist before proceeding
-                if (!slider || !input || !solDisplay || !rotDisplay) {
-                  console.warn('Token calculator elements not found');
-                  return;
-                }
                 
                 // Format number with commas
                 function formatNumber(num) {
@@ -898,21 +628,15 @@ export default function Home() {
                 }
               }
               
-              // Initialize both functions when DOM is loaded
-              function initializeAll() {
-                initTokenCalculator();
-                animatePhase1Progress();
-              }
-              
               // Initialize the animation when DOM is loaded
               if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeAll);
+                document.addEventListener('DOMContentLoaded', animatePhase1Progress);
               } else {
-                initializeAll();
+                animatePhase1Progress();
               }
             })();
-          `}
-        </script>
+          `
+        }}></script>
 
         {/* Bonus Features Section */}
         <div id="features" style={{
@@ -1126,16 +850,13 @@ export default function Home() {
                 overflow: 'hidden',
                 marginBottom: '0.5rem'
               }}>
-                <div
-                  id="phase1Progress"
-                  style={{
-                    height: '100%',
-                    width: '36%',
-                    background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
-                    borderRadius: '5px',
-                    transition: 'width 2s ease-in-out'
-                  }}
-                ></div>
+                <div id="phase1Progress" style={{
+                  height: '100%',
+                  width: '36%',
+                  background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+                  borderRadius: '5px',
+                  transition: 'width 2s ease-in-out'
+                }}></div>
               </div>
               
               <p style={{
@@ -1191,16 +912,12 @@ export default function Home() {
                 overflow: 'hidden',
                 marginBottom: '0.5rem'
               }}>
-                <div 
-                  id="phase2Progress"
-                  style={{
-                    height: '100%',
-                    width: '0%',
-                    background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
-                    borderRadius: '5px'
-                  }}
-                >
-                </div>
+                <div style={{
+                  height: '100%',
+                  width: '0%',
+                  background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
+                  borderRadius: '5px'
+                }}></div>
               </div>
               
               <p style={{
@@ -1256,15 +973,12 @@ export default function Home() {
                 overflow: 'hidden',
                 marginBottom: '0.5rem'
               }}>
-                <div 
-                  id="phase2Progress"
-                  style={{
-                    height: '100%',
-                    width: '0%',
-                    background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
-                    borderRadius: '5px'
-                  }}
-                ></div>
+                <div style={{
+                  height: '100%',
+                  width: '0%',
+                  background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+                  borderRadius: '5px'
+                }}></div>
               </div>
               
               <p style={{
@@ -1277,515 +991,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MEMES SECTION */}
-        <div style={{
-          background: 'rgba(10, 5, 20, 0.9)',
-          borderRadius: '15px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          border: '1px solid rgba(255, 45, 149, 0.5)',
-          boxShadow: '0 0 20px rgba(255, 45, 149, 0.3)'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            color: '#ff2d95',
-            textShadow: '0 0 10px rgba(255, 45, 149, 0.7)',
-            textAlign: 'center'
-          }}>
-            Viral Memes
-          </h2>
-          
-          <p style={{
-            fontSize: '1.2rem',
-            color: '#ddd',
-            marginBottom: '2rem',
-            fontStyle: 'italic',
-            textAlign: 'center'
-          }}>
-            The most brainrotting memes in the crypto space
-          </p>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem'
-          }}>
-            {/* Meme 1 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 45, 149, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme1.png" 
-                alt="Meme 1" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 1
-              </div>
-            </div>
-            
-            {/* Meme 2 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(0, 219, 222, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme2.png" 
-                alt="Meme 2" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 2
-              </div>
-            </div>
-            
-            {/* Meme 3 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(138, 43, 226, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme3.png" 
-                alt="Meme 3" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 3
-              </div>
-            </div>
-            
-            {/* Meme 4 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 94, 0, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme4.png" 
-                alt="Meme 4" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 4
-              </div>
-            </div>
-            
-            {/* Meme 5 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(0, 255, 157, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme5.png" 
-                alt="Meme 5" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 5
-              </div>
-            </div>
-            
-            {/* Meme 6 */}
-            <div style={{
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 45, 149, 0.3)',
-              overflow: 'hidden',
-              aspectRatio: '1/1'
-            }}>
-              <img 
-                src="./meme6.png" 
-                alt="Meme 6" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  target.style.display = 'none';
-                  if (nextSibling) {
-                    nextSibling.style.display = 'flex';
-                  }
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const nextSibling = target.nextElementSibling as HTMLDivElement;
-                  if (nextSibling) {
-                    nextSibling.style.display = 'none';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} 
-              />
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#777',
-                fontSize: '0.9rem',
-                textAlign: 'center',
-                padding: '1rem'
-              }}>
-                Meme 6
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* WHY CHOOSE ROT SECTION */}
-        <div style={{
-          background: 'rgba(10, 5, 20, 0.9)',
-          borderRadius: '15px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          border: '1px solid rgba(138, 43, 226, 0.5)',
-          boxShadow: '0 0 20px rgba(138, 43, 226, 0.3)'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            color: '#8a2be2',
-            textShadow: '0 0 10px rgba(138, 43, 226, 0.7)',
-            textAlign: 'center'
-          }}>
-            Why Choose $ROT?
-          </h2>
-          
-          <p style={{
-            fontSize: '1.2rem',
-            color: '#ddd',
-            marginBottom: '2rem',
-            fontStyle: 'italic',
-            textAlign: 'center'
-          }}>
-            The most advanced memecoin with real utility and maximum brainrot energy
-          </p>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem'
-          }}>
-            {/* Card 1 - Secure */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(255,94,0,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff2d95',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff2d95',
-                marginBottom: '1rem'
-              }}>
-                100% Secure
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                95% liquidity locked, 0% buy/sell tax, verified smart contract, and audited by top security firms
-              </p>
-            </div>
-            
-            {/* Card 2 - Growth */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0,219,222,0.2), rgba(0,255,157,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #00dbde',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#00dbde',
-                marginBottom: '1rem'
-              }}>
-                Explosive Growth
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Early access pricing with 50% bonus tokens before major exchange listings and viral marketing campaigns
-              </p>
-            </div>
-            
-            {/* Card 3 - Brainrot */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(138,43,226,0.2), rgba(255,45,149,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #8a2be2',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#8a2be2',
-                marginBottom: '1rem'
-              }}>
-                Pure Brainrot
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Guaranteed to give you maximum brainrot with viral memes, community rewards, and unstoppable energy
-              </p>
-            </div>
-            
-            {/* Card 4 - Community */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,94,0,0.2), rgba(255,45,149,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff5e00',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff5e00',
-                marginBottom: '1rem'
-              }}>
-                Strong Community
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Join thousands of holders in our active Telegram, Discord, and social media communities
-              </p>
-            </div>
-            
-            {/* Card 5 - Delivery */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0,255,157,0.2), rgba(0,219,222,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #00ff9d',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#00ff9d',
-                marginBottom: '1rem'
-              }}>
-                Instant Delivery
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Tokens delivered immediately after payment confirmation with zero delays or complications
-              </p>
-            </div>
-            
-            {/* Card 6 - Potential */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(138,43,226,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff2d95',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff2d95',
-                marginBottom: '1rem'
-              }}>
-                Massive Potential
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Early investor advantages with exclusive bonuses, airdrops, and first access to future developments
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* COMMUNITY SECTION */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
+        <div id="community" style={{
+          background: 'linear-gradient(135deg, rgba(255,94,0,0.1), rgba(255,45,149,0.1))',
           borderRadius: '15px',
           padding: '2rem',
           marginBottom: '2rem',
@@ -1846,18 +1054,22 @@ export default function Home() {
                 marginBottom: '1rem',
                 color: '#ff5e00'
               }}>
-
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 8V16" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M8 12H16" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
               <h3 style={{
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
-                color: '#4d94ff',
+                color: '#ff5e00',
                 marginBottom: '0.5rem'
               }}>
                 Telegram
               </h3>
               <p style={{
-                color: '#4d94ff',
+                color: '#ddd',
                 fontSize: '0.9rem'
               }}>
                 Join our community chat
@@ -1890,23 +1102,949 @@ export default function Home() {
                 marginBottom: '1rem',
                 color: '#ff2d95'
               }}>
-
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M23 3.00005C22.0424 3.67552 20.9821 4.19216 19.86 4.53005C19.2577 3.83756 18.4573 3.34674 17.567 3.12397C16.6767 2.90121 15.7395 2.95724 14.8821 3.2845C14.0247 3.61176 13.2884 4.19445 12.773 4.95376C12.2575 5.71308 11.9877 6.61238 12 7.53005V8.53005C10.2426 8.57561 8.50127 8.18586 6.93101 7.39549C5.36074 6.60513 4.01032 5.43868 3 4.00005C3 4.00005 -1 13 8 17C5.94053 18.398 3.48716 19.099 1 19C10 24 21 19 21 7.50005C20.9991 7.2215 20.9723 6.94364 20.92 6.67005C21.9406 5.66354 22.6608 4.39276 23 3.00005Z" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
               <h3 style={{
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
-                color: '#ffffff',
+                color: '#ff2d95',
                 marginBottom: '0.5rem'
               }}>
-                X
+                Twitter
               </h3>
               <p style={{
-                color: '#ffffff',
+                color: '#ddd',
                 fontSize: '0.9rem'
               }}>
                 Follow for updates
               </p>
             </a>
+          </div>
+        </div>
+
+        {/* TEAM SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(0,219,222,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(0, 219, 222, 0.2)'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #00dbde, #8a2be2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Roadmap to Maximum Brainrot
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic'
+          }}>
+            Our path to memecoin domination and viral brainrot distribution
+          </p>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1.5rem'
+          }}>
+            {/* Q1 2025 */}
+            <div style={{
+              background: 'rgba(255,45,149,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #ff2d95',
+              textAlign: 'left'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#ff2d95'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="#ff2d95" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#ff2d95',
+                    margin: 0
+                  }}>
+                    Q1 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff5e00',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    LAUNCH PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                IN PROGRESS
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Website Launch
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Presale Live
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Community Building
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#00dbde',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                  Meme Creation
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q2 2025 */}
+            <div style={{
+              background: 'rgba(0,219,222,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #00dbde',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#00dbde'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8L2 22H16L22 16L16 8Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 8L12 4L2 14L6 18L16 8Z" stroke="#00dbde" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#00dbde',
+                    margin: 0
+                  }}>
+                    Q2 2025
+                  </h3>
+                  <p style={{
+                    color: '#00ff9d',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    EXCHANGE PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #00dbde, #00ff9d)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                COMING SOON
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  DEX Listings
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Major CEX Listings
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Influencer Partnerships
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Staking Rewards
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q3 2025 */}
+            <div style={{
+              background: 'rgba(138,43,226,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #8a2be2',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#8a2be2'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 22C13.1 22 14 21.1 14 20C14 18.9 13.1 18 12 18C10.9 18 10 18.9 10 20C10 21.1 10.9 22 12 22Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 12C22 13.1 21.1 14 20 14C18.9 14 18 13.1 18 12C18 10.9 18.9 10 20 10C21.1 10 22 10.9 22 12Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12C2 13.1 2.9 14 4 14C5.1 14 6 13.1 6 12C6 10.9 5.1 10 4 10C2.9 10 2 10.9 2 12Z" stroke="#8a2be2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#8a2be2',
+                    margin: 0
+                  }}>
+                    Q3 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    ECOSYSTEM PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #8a2be2, #ff2d95)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                PLANNED
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Brainrot Games
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  NFT Collection
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  DAO Governance
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Mobile App
+                </li>
+              </ul>
+            </div>
+            
+            {/* Q4 2025 */}
+            <div style={{
+              background: 'rgba(255,94,0,0.15)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #ff5e00',
+              textAlign: 'left',
+              opacity: '0.8'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '1.8rem',
+                  marginRight: '0.8rem',
+                  color: '#ff5e00'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3H9C8.44772 4.55228 8 6.22542 8 8C8 11.3137 10.6863 14 14 14C15.7746 14 17.4477 13.5523 19 13V14" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 21H15C15.5523 19.4477 16 17.7746 16 16C16 12.6863 13.3137 10 10 10C8.22542 10 6.55228 10.4477 5 11V10" stroke="#ff5e00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: 'bold',
+                    color: '#ff5e00',
+                    margin: 0
+                  }}>
+                    Q4 2025
+                  </h3>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontWeight: 'bold',
+                    margin: 0
+                  }}>
+                    DOMINATION PHASE
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{
+                display: 'inline-block',
+                background: 'linear-gradient(90deg, #ff5e00, #ff2d95)',
+                color: 'white',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                FUTURE
+              </div>
+              
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Global Expansion
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Top 10 Memecoin
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '0.8rem',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Metaverse Integration
+                </li>
+                <li style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#ddd'
+                }}>
+                  <span style={{
+                    color: '#aaa',
+                    marginRight: '0.5rem',
+                    fontSize: '1.2rem'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="#aaa" strokeWidth="2"/>
+                    </svg>
+                  </span>
+                  Moon Mission
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* TOKENOMICS SECTION */}
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center max-w-7xl">
+            <div className="flex flex-col items-center justify-center">
+              <h2 className="text-4xl font-bold text-center">Tokenomics</h2>
+              <p className="text-lg text-center mt-4">
+                Our tokenomics are designed to incentivize long-term growth and community participation.
+              </p>
+              <ul className="mt-8 space-y-4">
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Annual Inflation Rate: 5%</span>
+                </li>
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Community Fund: 10% of all transaction fees</span>
+                </li>
+                <li className="flex items-center">
+                  <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-4"></span>
+                  <span>Staking Rewards: Up to 10% per year</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* COMMUNITY SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+</
+```
+
+```
+          </div>
+        </div>
+
+        {/* TOKENOMICS SECTION */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
+          borderRadius: '15px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          border: '1px solid rgba(255, 45, 149, 0.2)'
+        }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            background: 'linear-gradient(90deg, #ff2d95, #8a2be2)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            backgroundClip: 'text',
+            textAlign: 'center'
+          }}>
+            Tokenomics
+          </h2>
+          
+          <p style={{
+            fontSize: '1.2rem',
+            color: '#ddd',
+            marginBottom: '2rem',
+            fontStyle: 'italic',
+            textAlign: 'center'
+          }}>
+            Fair distribution with focus on community and long-term growth
+          </p>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '2rem'
+          }}>
+            {/* Token Details Card */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid rgba(255, 45, 149, 0.3)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#ff2d95',
+                marginBottom: '1rem',
+                textAlign: 'center'
+              }}>
+                Token Details
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem'
+              }}>
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Token Name:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    BRAINROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Symbol:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    $ROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Total Supply:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    7,777,777,777
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Presale Price:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    1 SOL = 1M $ROT
+                  </p>
+                </div>
+                
+                <div>
+                  <p style={{
+                    color: '#aaa',
+                    fontSize: '0.9rem',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Launch Price:
+                  </p>
+                  <p style={{
+                    color: '#fff',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    1 SOL = 500K $ROT
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Distribution Card */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid rgba(138, 43, 226, 0.3)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: 'bold',
+                color: '#8a2be2',
+                marginBottom: '1rem',
+                textAlign: 'center'
+              }}>
+                Distribution
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Presale
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      2.59B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#ff2d95',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    33.3%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Liquidity
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      1.94B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#00dbde',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    25%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Marketing
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      1.56B $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#ff5e00',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    20%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingBottom: '0.5rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Team
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      777M $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#8a2be2',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    10%
+                  </p>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <p style={{
+                      color: '#fff',
+                      fontSize: '1.1rem',
+                      fontWeight: 'bold'
+                    }}>
+                      Development
+                    </p>
+                    <p style={{
+                      color: '#aaa',
+                      fontSize: '0.9rem'
+                    }}>
+                      910M $ROT
+                    </p>
+                  </div>
+                  <p style={{
+                    color: '#00ff9d',
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold'
+                  }}>
+                    11.7%
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1924,7 +2062,7 @@ export default function Home() {
             marginBottom: '0.5rem',
             color: '#ff5e00'
           }}>
-            🚨 ONLY 471.3 SOL LEFT!
+            🚨 ONLY 12.8 SOL LEFT!
           </p>
           <p style={{
             fontSize: '1rem',
@@ -1941,7 +2079,7 @@ export default function Home() {
           }}>
             <div style={{
               height: '100%',
-              width: '36%',
+              width: '87%',
               background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
               borderRadius: '10px'
             }}></div>
@@ -1951,12 +2089,9 @@ export default function Home() {
             color: '#aaa',
             marginTop: '0.5rem'
           }}>
-            36% SOLD - Almost full!
+            87% SOLD - Almost full!
           </p>
         </div>
-
-        {/* TOKENOMICS SECTION */}
-        <TokenInfo />
 
         {/* FAQ SECTION */}
         <div style={{
@@ -2023,7 +2158,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   borderTop: '1px solid rgba(255, 45, 149, 0.2)'
                 }}>
-                  <p>$BRAINROT is the ultimate memecoin designed to give you maximum brainrot. It&#39;s a community-driven token on Solana with 0% tax, 95% liquidity locked, and built for viral growth and meme culture domination.</p>
+                  <p>$BRAINROT is the ultimate memecoin designed to give you maximum brainrot. It's a community-driven token on Solana with 0% tax, 95% liquidity locked, and built for viral growth and meme culture domination.</p>
                 </div>
               </details>
             </div>
@@ -2089,7 +2224,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   borderTop: '1px solid rgba(138, 43, 226, 0.2)'
                 }}>
-                  <p>Unlike other memecoins, $BRAINROT has 0% buy/sell tax, 95% locked liquidity, instant token delivery, and a vibrant community. We&#39;re building an entire ecosystem with games, NFTs, and real utility while maintaining maximum meme energy.</p>
+                  <p>Unlike other memecoins, $BRAINROT has 0% buy/sell tax, 95% locked liquidity, instant token delivery, and a vibrant community. We're building an entire ecosystem with games, NFTs, and real utility while maintaining maximum meme energy.</p>
                 </div>
               </details>
             </div>
@@ -2122,7 +2257,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   borderTop: '1px solid rgba(255, 94, 0, 0.2)'
                 }}>
-                  <p>Yes! Our smart contract is audited, 95% of liquidity is permanently locked, there&#39;s 0% tax, and the team tokens are vested. We&#39;re fully transparent with our tokenomics and security measures.</p>
+                  <p>Yes! Our smart contract is audited, 95% of liquidity is permanently locked, there's 0% tax, and the team tokens are vested. We're fully transparent with our tokenomics and security measures.</p>
                 </div>
               </details>
             </div>
@@ -2155,7 +2290,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   borderTop: '1px solid rgba(0, 255, 157, 0.2)'
                 }}>
-                  <p>We&#39;re planning DEX listings in Q2 2025 followed by major CEX listings. Presale participants get the best price before public launch. Join our Telegram for the latest updates on exchange listings.</p>
+                  <p>We're planning DEX listings in Q2 2025 followed by major CEX listings. Presale participants get the best price before public launch. Join our Telegram for the latest updates on exchange listings.</p>
                 </div>
               </details>
             </div>
@@ -2179,7 +2314,7 @@ export default function Home() {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span>What&#39;s the presale bonus?</span>
+                  <span>What's the presale bonus?</span>
                   <span style={{ fontSize: '1.5rem' }}>+</span>
                 </summary>
                 <div style={{
@@ -2245,7 +2380,7 @@ export default function Home() {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span>What&#39;s the roadmap for $BRAINROT?</span>
+                  <span>What's the roadmap for $BRAINROT?</span>
                   <span style={{ fontSize: '1.5rem' }}>+</span>
                 </summary>
                 <div style={{
@@ -2254,7 +2389,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   borderTop: '1px solid rgba(138, 43, 226, 0.2)'
                 }}>
-                  <p>We&#39;re building a complete ecosystem: Q1 presale and community building, Q2 exchange listings, Q3 games and NFTs, Q4 global expansion and metaverse integration. Check our roadmap section for detailed milestones.</p>
+                  <p>We're building a complete ecosystem: Q1 presale and community building, Q2 exchange listings, Q3 games and NFTs, Q4 global expansion and metaverse integration. Check our roadmap section for detailed milestones.</p>
                 </div>
               </details>
             </div>
@@ -2271,6 +2406,9 @@ export default function Home() {
           marginTop: '2rem'
         }}>
           <p>© 2025 $BRAINROT - The Ultimate Memecoin Experience</p>
+          <p style={{ marginTop: '0.5rem' }}>
+            Disclaimer: This is a meme token with no intrinsic value. Invest only what you can afford to lose.
+          </p>
         </div>
       </div>
     </div>

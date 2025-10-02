@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { WalletAdapterProvider } from "@/components/WalletAdapterProvider";
 import Navbar from "@/components/Navbar";
-import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "BrainRot | $ROT Memecoin",
@@ -21,7 +20,6 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
       </head>
       <body>
-        <Toaster position="top-right" />
         <WalletAdapterProvider>
           <Navbar />
           <main style={{
