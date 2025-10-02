@@ -1591,21 +1591,12 @@ export default function Home() {
                 padding: '1rem'
               }}>
                 Meme 6
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* WHY CHOOSE ROT SECTION */}
-        <div style={{
-          background: 'rgba(10, 5, 20, 0.9)',
-          borderRadius: '15px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          border: '1px solid rgba(138, 43, 226, 0.5)',
-          boxShadow: '0 0 20px rgba(138, 43, 226, 0.3)'
-        }}>
-          <h2 style={{
+        {/* WHY CHOOSE $ROT SECTION */}
+        <div className="why-choose-container text-center" style={{
+          padding: '3rem 2rem',
             fontSize: '2.5rem',
             fontWeight: 'bold',
             marginBottom: '1rem',
