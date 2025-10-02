@@ -8,6 +8,9 @@ import { TransactionStatus } from '@/components/TransactionStatus';
 import { toast } from 'react-hot-toast';
 import WhyChooseRot from '@/components/WhyChooseRot';
 import ReferralLeaderboard from '@/components/ReferralLeaderboard';
+import LiveStats from '@/components/LiveStats';
+import ROICalculator from '@/components/ROICalculator';
+import LiveTicker from '@/components/LiveTicker';
 
 export default function Home() {
   // Countdown timer state
@@ -257,6 +260,12 @@ export default function Home() {
         }}>
           ⚡ LIMITED TIME OFFER ⚡
         </div>
+
+        {/* LIVE STATS */}
+        <LiveStats />
+
+        {/* LIVE PURCHASE TICKER */}
+        <LiveTicker />
 
         {/* COUNTDOWN TIMER */}
         <div style={{
@@ -1750,6 +1759,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* ROI CALCULATOR */}
+        <ROICalculator />
 
         <WhyChooseRot />
 
