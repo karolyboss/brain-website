@@ -7,6 +7,7 @@ import TokenInfo from '@/components/TokenInfo';
 import { TransactionStatus } from '@/components/TransactionStatus';
 import { toast } from 'react-hot-toast';
 import WhyChooseRot from '@/components/WhyChooseRot';
+import ReferralLeaderboard from '@/components/ReferralLeaderboard';
 
 export default function Home() {
   // Countdown timer state
@@ -156,6 +157,28 @@ export default function Home() {
       
       setTransactionStatus(`Payment successful! Transaction ID: ${signature.slice(0, 20)}... Tokens will be delivered within 1-2 hours.`);
       toast.success('Transaction successful!');
+      
+      // Track referral and reward referrer
+      const referrer = localStorage.getItem('referrer');
+      if (referrer && publicKey) {
+        const referralData = JSON.parse(localStorage.getItem('referralData') || '[]');
+        const referrerIndex = referralData.findIndex((entry: any) => entry.wallet === referrer);
+        
+        if (referrerIndex >= 0) {
+          referralData[referrerIndex].referrals += 1;
+          referralData[referrerIndex].tokensEarned += 1000;
+        } else {
+          referralData.push({ wallet: referrer, referrals: 1, tokensEarned: 1000 });
+        }
+        
+        localStorage.setItem('referralData', JSON.stringify(referralData));
+        toast.success('Referrer earned 1,000 $ROT bonus! 🎁');
+      }
+      
+      // Store user wallet for their own referral link
+      if (publicKey) {
+        localStorage.setItem('userWallet', publicKey.toString());
+      }
       
       // Dispatch custom event to update balance in Navbar
       const balanceUpdateEvent = new CustomEvent('balanceUpdate', {
@@ -1777,6 +1800,9 @@ export default function Home() {
 
         {/* TOKENOMICS SECTION */}
         <TokenInfo />
+
+        {/* REFERRAL LEADERBOARD */}
+        <ReferralLeaderboard />
 
         {/* FAQ SECTION */}
         <div style={{
