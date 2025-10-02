@@ -1,12 +1,13 @@
-import path from 'path';
-
 const nextConfig = {
-  output: 'export', // 👈 This makes it static
-  turbo: {
-    root: path.join(__dirname, '.'),
-  },
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  images: {
+    unoptimized: true,
   },
 };
 
