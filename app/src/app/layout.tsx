@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import "./navbar.css";
 import "./mobile-fixes.css";
 import { WalletAdapterProvider } from "@/components/WalletAdapterProvider";
@@ -7,8 +6,7 @@ import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "BrainRot | $ROT Memecoin",
-  description: "Join the BrainRot revolution! Buy $ROT tokens in presale with bonuses.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  description: "Join the BrainRot revolution! Buy $ROT tokens in presale with bonuses."
 };
 
 export default function RootLayout({
@@ -19,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
         <WalletAdapterProvider>

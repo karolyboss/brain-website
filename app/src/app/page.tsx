@@ -1452,15 +1452,13 @@ export default function Home() {
         }}>
           <h2 style={{
             fontSize: '2.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            color: '#ff2d95',
-            textShadow: '0 0 10px rgba(255, 45, 149, 0.7)',
+            color: '#00f0ff',
+            marginBottom: '1.5rem',
+            textShadow: '0 0 10px rgba(0, 240, 255, 0.7)',
             textAlign: 'center'
           }}>
             Viral Memes
           </h2>
-          
           <p style={{
             fontSize: '1.2rem',
             color: '#ddd',
