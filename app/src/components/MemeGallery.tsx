@@ -61,11 +61,11 @@ export default function MemeGallery() {
     setIsLoading(true);
     Promise.all(
       memes.map((meme) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           const img = new Image();
           img.src = meme.src;
-          img.onload = resolve;
-          img.onerror = reject;
+          img.onload = () => resolve();
+          img.onerror = () => reject();
         });
       })
     )
