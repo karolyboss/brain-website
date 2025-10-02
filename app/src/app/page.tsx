@@ -344,9 +344,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* BUY $ROT TOKEN SECTION */}
+        {/* COMMUNITY SECTION */}
         <div style={{
-          background: 'rgba(10, 5, 20, 0.9)',
+          background: 'linear-gradient(135deg, rgba(255,45,149,0.1), rgba(138,43,226,0.1))',
           borderRadius: '15px',
           padding: '2rem',
           marginBottom: '2rem',
@@ -1740,7 +1740,7 @@ export default function Home() {
             marginBottom: '0.5rem',
             color: '#ff5e00'
           }}>
-            🚨 ONLY 471.3 SOL LEFT!
+            🚨 ONLY 416.6 SOL LEFT!
           </p>
           <p style={{
             fontSize: '1rem',
@@ -1757,7 +1757,7 @@ export default function Home() {
           }}>
             <div style={{
               height: '100%',
-              width: '36%',
+              width: '43%',
               background: 'linear-gradient(90deg, #ff2d95, #ff5e00)',
               borderRadius: '10px'
             }}></div>
@@ -1767,7 +1767,7 @@ export default function Home() {
             color: '#aaa',
             marginTop: '0.5rem'
           }}>
-            36% SOLD - Almost full!
+            43% SOLD - Almost full!
           </p>
         </div>
 
