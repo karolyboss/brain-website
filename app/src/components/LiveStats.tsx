@@ -5,23 +5,25 @@ import './LiveStats.css';
 
 export default function LiveStats() {
   const [totalRaised, setTotalRaised] = useState(127543);
-  const [holders, setHolders] = useState(2847);
+  const [holders, setHolders] = useState(415);
   const [solLeft, setSolLeft] = useState(416.6);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Listen for purchase events from LiveTicker
+    const handlePurchase = () => {
+      setHolders(prev => prev + 1);
       setTotalRaised(prev => prev + Math.floor(Math.random() * 500) + 100);
-      setHolders(prev => prev + Math.floor(Math.random() * 3));
       setSolLeft(prev => Math.max(0, prev - (Math.random() * 0.5)));
-    }, 15000);
+    };
 
-    return () => clearInterval(interval);
+    window.addEventListener('newPurchase', handlePurchase);
+
+    return () => window.removeEventListener('newPurchase', handlePurchase);
   }, []);
 
   return (
     <div className="live-stats-container">
       <div className="live-stats-header">
-        <span className="live-pulse"></span>
         <span className="live-text">LIVE STATS</span>
       </div>
       

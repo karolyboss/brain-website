@@ -35,7 +35,7 @@ export default function LiveTicker() {
     }));
     setPurchases(initial);
 
-    // Add new purchase every 8-15 seconds
+    // Add new purchase every 30-60 seconds (slower, more realistic)
     const interval = setInterval(() => {
       const newPurchase = {
         id: Date.now(),
@@ -45,7 +45,10 @@ export default function LiveTicker() {
       };
 
       setPurchases(prev => [newPurchase, ...prev.slice(0, 4)]);
-    }, Math.random() * 7000 + 8000);
+      
+      // Trigger stats update
+      window.dispatchEvent(new Event('newPurchase'));
+    }, Math.random() * 30000 + 30000);
 
     return () => clearInterval(interval);
   }, []);
