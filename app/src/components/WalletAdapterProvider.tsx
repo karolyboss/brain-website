@@ -16,10 +16,23 @@ export const WalletAdapterProvider: FC<{ children: ReactNode }> = ({ children })
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Mainnet;
 
-  // Use reliable public RPC endpoint
+  // Use reliable public RPC endpoint with fallbacks
   const endpoint = useMemo(() => {
-    // Try environment variable first, then fallback to public endpoint
-    return process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+    // Try environment variable first, then use fallback RPCs
+    if (process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
+      return process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
+    }
+    
+    // Use multiple fallback RPCs
+    const fallbackRPCs = [
+      'https://solana-mainnet.rpc.extrnode.com',
+      'https://rpc.ankr.com/solana',
+      'https://solana.public-rpc.com',
+      'https://api.mainnet-beta.solana.com'
+    ];
+    
+    // Randomly select one to distribute load
+    return fallbackRPCs[Math.floor(Math.random() * fallbackRPCs.length)];
   }, []);
 
   const wallets = useMemo(
