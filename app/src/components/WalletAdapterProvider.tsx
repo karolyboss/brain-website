@@ -16,23 +16,10 @@ export const WalletAdapterProvider: FC<{ children: ReactNode }> = ({ children })
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Mainnet;
 
-  // Use reliable RPC endpoints with better rate limits
+  // Use reliable public RPC endpoint
   const endpoint = useMemo(() => {
-    const endpoints = [
-      'https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/',
-      'https://solana-mainnet.g.alchemy.com/v2/3qg4v0Ga9P9PwQk-S2ZMogHvlYgESIKj',
-      'https://rpc.ankr.com/solana',
-      'https://api.mainnet-beta.solana.com'
-    ];
-
-    // Try to get a custom RPC endpoint from environment variables
-    const customEndpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
-    if (customEndpoint?.trim()) {
-      endpoints.unshift(customEndpoint);
-    }
-
-    // Return the first endpoint, others will be used as fallbacks
-    return endpoints[0];
+    // Try environment variable first, then fallback to public endpoint
+    return process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
   }, []);
 
   const wallets = useMemo(
