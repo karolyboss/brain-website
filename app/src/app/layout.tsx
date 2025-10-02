@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./navbar.css";
+import "./mobile-fixes.css";
 import { WalletAdapterProvider } from "@/components/WalletAdapterProvider";
 import Navbar from "@/components/Navbar";
 

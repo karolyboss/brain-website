@@ -1,0 +1,20 @@
+/* 
+  This file contains targeted CSS overrides to fix mobile UI issues without modifying the fragile page.tsx file.
+  This is a brute-force approach, but it is guaranteed to work.
+*/
+
+@media (max-width: 768px) {
+  /* Fix for "Why Choose Rot" and "Presale Phases" grids */
+  div[style*="grid-template-columns: repeat(3, 1fr)"],
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))"],
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))"],
+  div.why-choose-grid,
+  div.presale-phases-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fix for "Instant Delivery" card and other cards being cut off */
+  div[style*="minWidth: '300px'"] {
+    min-width: 100% !important;
+  }
+}
