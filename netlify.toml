@@ -1,6 +1,6 @@
 [build]
   base = "app"
-  command = "npm ci --legacy-peer-deps --no-optional || npm install --legacy-peer-deps --no-optional && npm run build"
+  command = "rm -rf node_modules .next out && npm ci --legacy-peer-deps --no-optional || npm install --legacy-peer-deps --no-optional && npm run build"
   publish = "out"
 
 [build.environment]
