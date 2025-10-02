@@ -5,13 +5,22 @@ import './LiveTicker.css';
 
 interface Purchase {
   id: number;
-  name: string;
+  wallet: string;
   amount: string;
   time: string;
 }
 
-const names = ['Sarah', 'Mike', 'Alex', 'Emma', 'John', 'Lisa', 'David', 'Maria', 'Chris', 'Anna'];
 const amounts = ['10,000', '25,000', '50,000', '75,000', '100,000', '150,000', '200,000'];
+
+// Generate random Solana-like wallet address (10 characters)
+const generateWallet = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789';
+  let wallet = '';
+  for (let i = 0; i < 10; i++) {
+    wallet += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return wallet;
+};
 
 export default function LiveTicker() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -20,7 +29,7 @@ export default function LiveTicker() {
     // Generate initial purchases
     const initial = Array.from({ length: 3 }, (_, i) => ({
       id: i,
-      name: names[Math.floor(Math.random() * names.length)],
+      wallet: generateWallet(),
       amount: amounts[Math.floor(Math.random() * amounts.length)],
       time: `${Math.floor(Math.random() * 10) + 1} mins ago`
     }));
@@ -30,7 +39,7 @@ export default function LiveTicker() {
     const interval = setInterval(() => {
       const newPurchase = {
         id: Date.now(),
-        name: names[Math.floor(Math.random() * names.length)],
+        wallet: generateWallet(),
         amount: amounts[Math.floor(Math.random() * amounts.length)],
         time: 'Just now'
       };
@@ -51,10 +60,10 @@ export default function LiveTicker() {
       <div className="ticker-list">
         {purchases.map((purchase) => (
           <div key={purchase.id} className="ticker-item">
-            <div className="ticker-avatar">{purchase.name[0]}</div>
+            <div className="ticker-avatar">{purchase.wallet[0]}</div>
             <div className="ticker-content">
               <div className="ticker-text">
-                <strong>{purchase.name}</strong> bought <strong>{purchase.amount} $ROT</strong>
+                <strong>{purchase.wallet}</strong> bought <strong>{purchase.amount} $ROT</strong>
               </div>
               <div className="ticker-time">{purchase.time}</div>
             </div>
