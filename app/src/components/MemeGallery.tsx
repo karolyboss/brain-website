@@ -61,7 +61,7 @@ export default function MemeGallery() {
     setIsLoading(true);
     Promise.all(
       memes.map((meme) => {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise((resolve: () => void, reject: () => void) => {
           const img = new Image();
           img.src = meme.src;
           img.onload = () => resolve();
@@ -182,3 +182,4 @@ export default function MemeGallery() {
     </div>
   );
 }
+
