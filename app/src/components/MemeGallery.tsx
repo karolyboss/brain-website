@@ -58,26 +58,42 @@ export default function MemeGallery() {
 
   // Preload images
   useEffect(() => {
-    setIsLoading(true);
-    Promise.all(
-      memes.map((meme) => {
-        return new Promise<void>((resolve, reject) => {
-          const img = new Image();
-          img.src = meme.src;
-          img.onload = () => resolve(undefined);
-          img.onerror = () => reject(new Error("Failed to load image"));
-        });
-      })
-    )
-      .then(() => {
-        setIsLoading(false);
-        setError(null);
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setError('Failed to load some images');
+    let isCancelled = false;
+
+    // Helper function to preload a single image
+    const preloadImage = (src: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.src = src;
+        img.onload = () => resolve();
+        img.onerror = (err) => reject(err);
       });
-  }, []);
+    };
+
+    const preload = async () => {
+      setIsLoading(true);
+      try {
+        for (const meme of memes) {
+          await preloadImage(meme.src);
+        }
+        if (!isCancelled) {
+          setIsLoading(false);
+          setError(null);
+        }
+      } catch (e) {
+        if (!isCancelled) {
+          setError('Failed to load some images');
+          setIsLoading(false);
+        }
+      }
+    };
+
+    preload();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [memes]);
 
   return (
     <div className="card-float-static bg-gray-900/50 backdrop-blur-md rounded-2xl p-8 mb-12 border border-gray-800">
@@ -156,31 +172,4 @@ export default function MemeGallery() {
       )}
     </div>
   );
-          >
-            <div className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <div className="text-9xl">🤪</div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-4 gradient-text">
-                {memes.find(m => m.id === selectedMeme)?.title}
-              </h3>
-              <p className="text-gray-300 mb-6">
-                Another brainrotted meme from the $ROT collection. Share with your friends and spread the memetic infection!
-              </p>
-              <div className="flex justify-end">
-                <button 
-                  className="btn-3d bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors"
-                  onClick={() => setSelectedMeme(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
-
-
