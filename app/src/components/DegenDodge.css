@@ -4,11 +4,17 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 100%);
+  background: #000000;
   color: white;
   font-family: 'Arial', sans-serif;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .game-header {
@@ -24,11 +30,14 @@
 
 .game-area {
   position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 15px;
+  background: #000000;
+  border: none;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
   touch-action: none;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .player {
