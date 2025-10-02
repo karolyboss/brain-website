@@ -232,6 +232,62 @@ export default function Home() {
         width: '100%',
         textAlign: 'center'
       }}>
+        {/* LOGO SECTION */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: '2rem',
+          padding: '2rem 0'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            {/* Brain Logo */}
+            <div style={{
+              fontSize: '8rem',
+              animation: 'pulse 3s ease-in-out infinite',
+              filter: 'drop-shadow(0 0 20px rgba(255, 45, 149, 0.5))',
+              cursor: 'pointer'
+            }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            title="Click to scroll to top"
+            >
+              🧠
+            </div>
+
+            {/* Project Name */}
+            <h1 style={{
+              fontSize: '3rem',
+              fontWeight: 'bold',
+              margin: 0,
+              background: 'linear-gradient(90deg, #ff2d95, #8a2be2, #00dbde)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              backgroundClip: 'text',
+              textAlign: 'center',
+              letterSpacing: '2px'
+            }}>
+              BRAINROT
+            </h1>
+
+            {/* Tagline */}
+            <p style={{
+              fontSize: '1.5rem',
+              color: '#ddd',
+              margin: 0,
+              fontStyle: 'italic',
+              opacity: 0.9
+            }}>
+              The Ultimate Memecoin Experience
+            </p>
+          </div>
+        </div>
+
         {/* PRESALE HEADER */}
         <h1 style={{ 
           fontSize: '4rem',
