@@ -57,19 +57,20 @@ export class TransactionTracker {
         signaturePromise,
         timeoutPromise
       ]);
-
       updateProgress({ signature, status: 'confirming' });
 
       // Track confirmations
       let confirmations = 0;
       while (confirmations < this.maxConfirmations) {
-        const response = await this.connection.confirmTransaction(signature);
+        const response = await this.connection.getSignatureStatus(signature, { searchTransactionHistory: true });
         
-        if (response.value.err) {
+        // Update confirmations, keeping the previous value if the new one is null
+        confirmations = response.value?.confirmations ?? confirmations;
+
+        if (response.value?.err) {
           throw new Error('Transaction failed during confirmation');
         }
 
-        confirmations = response.value.confirmations || 0;
         updateProgress({ confirmations });
 
         if (confirmations >= this.maxConfirmations) {
@@ -80,8 +81,8 @@ export class TransactionTracker {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
+      // If the loop finishes, it means we have enough confirmations
       return updateProgress({ status: 'success' });
-
     } catch (error: any) {
       console.error('Transaction error:', error);
 
