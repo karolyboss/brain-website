@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { Transaction } from '@solana/web3.js';
 import { TransactionTracker } from '@/utils/transactionTracker';
 import { WalletErrorMessages, handleWalletError } from '@/utils/walletErrors';
