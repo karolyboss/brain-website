@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
@@ -19,18 +19,8 @@
 [context.branch-deploy]
   ignore = "true"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Rewrite rule to handle Next.js pages
+# Handle SPA routing for static export
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/next_render"
+  to = "/index.html"
   status = 200
-  force = true
-
-# Handle 404 pages
-[[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404

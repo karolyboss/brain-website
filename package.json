@@ -1,0 +1,27 @@
+{
+  "name": "brain-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karolyboss/brain-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karolyboss/brain-website/issues"
+  },
+  "homepage": "https://github.com/karolyboss/brain-website#readme",
+  "dependencies": {
+    "@solana/wallet-adapter-react": "^0.15.45",
+    "@solana/web3.js": "^1.99.0",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}

@@ -1,40 +1,26 @@
 {
   "name": "brain-website",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "@solana/wallet-adapter-react": "^0.15.39",
-    "@solana/wallet-adapter-react-ui": "^0.9.39",
-    "@solana/wallet-adapter-wallets": "^0.19.37",
-    "@solana/web3.js": "^1.98.4",
-    "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.44.5",
-    "framer-motion": "^12.23.22",
-    "next": "15.5.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-hot-toast": "^2.6.0",
-    "react-icons": "^5.5.0"
+    "@solana/wallet-adapter-react": "^0.15.45",
+    "@solana/web3.js": "^1.99.0",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@svgr/webpack": "^8.1.0",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4",
-    "stylelint": "^16.24.0",
-    "stylelint-config-standard": "^36.0.1",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
+    "typescript": "^5.7.3"
   }
 }
