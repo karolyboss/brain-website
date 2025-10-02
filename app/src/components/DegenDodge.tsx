@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './DegenDodge.css';
 
 type GameObject = {
@@ -341,13 +341,15 @@ export default function DegenDodge() {
     console.log(`Playing sound: ${type}`);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!gameStarted || gameOver) return;
-    
+
     const moveAmount = 20;
-    
+
     switch (e.key) {
       case 'ArrowLeft':
+      case 'Left':
+      case 'KeyA':
       case 'a':
       case 'A':
         setPlayer(prev => ({
@@ -356,6 +358,8 @@ export default function DegenDodge() {
         }));
         break;
       case 'ArrowRight':
+      case 'Right':
+      case 'KeyD':
       case 'd':
       case 'D':
         setPlayer(prev => ({
@@ -364,6 +368,8 @@ export default function DegenDodge() {
         }));
         break;
       case 'ArrowUp':
+      case 'Up':
+      case 'KeyW':
       case 'w':
       case 'W':
         setPlayer(prev => ({
@@ -372,6 +378,8 @@ export default function DegenDodge() {
         }));
         break;
       case 'ArrowDown':
+      case 'Down':
+      case 'KeyS':
       case 's':
       case 'S':
         setPlayer(prev => ({
@@ -379,8 +387,58 @@ export default function DegenDodge() {
           y: Math.min(GAME_HEIGHT - prev.height - 20, prev.y + moveAmount)
         }));
         break;
+      default:
+        return;
     }
-  };
+
+    // Prevent the page from scrolling when using arrow keys
+    e.preventDefault();
+  }, [gameOver, gameStarted]);
+
+  useEffect(() => {
+    const relevantKeys = new Set([
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Left',
+      'Right',
+      'Up',
+      'Down',
+      'KeyA',
+      'KeyD',
+      'KeyW',
+      'KeyS',
+      'a',
+      'A',
+      'd',
+      'D',
+      'w',
+      'W',
+      's',
+      'S'
+    ]);
+
+    const handleKeyDownEvent = (event: KeyboardEvent) => {
+      if (!relevantKeys.has(event.key) && !relevantKeys.has(event.code)) {
+        return;
+      }
+
+      handleKeyDown(event);
+    };
+
+    window.addEventListener('keydown', handleKeyDownEvent, { passive: false });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDownEvent);
+    };
+  }, [handleKeyDown]);
+
+  useEffect(() => {
+    if (gameStarted && gameAreaRef.current) {
+      gameAreaRef.current.focus({ preventScroll: true });
+    }
+  }, [gameStarted]);
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!gameStarted || gameOver) return;
