@@ -6,6 +6,7 @@ import { LAMPORTS_PER_SOL, Transaction, SystemProgram, PublicKey } from '@solana
 import TokenInfo from '@/components/TokenInfo';
 import { TransactionStatus } from '@/components/TransactionStatus';
 import { toast } from 'react-hot-toast';
+import WhyChooseRot from '@/components/WhyChooseRot';
 
 export default function Home() {
   // Countdown timer state
@@ -1591,191 +1592,12 @@ export default function Home() {
                 padding: '1rem'
               }}>
                 Meme 6
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* WHY CHOOSE $ROT SECTION */}
-        <div className="why-choose-container text-center" style={{
-          padding: '3rem 2rem',
-          textAlign: 'center'
-        }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            color: '#8a2be2',
-            textShadow: '0 0 10px rgba(138, 43, 226, 0.7)',
-            textAlign: 'center'
-          }}>
-            Why Choose $ROT?
-          </h2>
-          
-          <p style={{
-            fontSize: '1.2rem',
-            color: '#ddd',
-            marginBottom: '2rem',
-            fontStyle: 'italic',
-            textAlign: 'center'
-          }}>
-            The most advanced memecoin with real utility and maximum brainrot energy
-          </p>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1.5rem'
-          }}>
-            {/* Card 1 - Secure */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(255,94,0,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff2d95',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff2d95',
-                marginBottom: '1rem'
-              }}>
-                100% Secure
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                95% liquidity locked, 0% buy/sell tax, verified smart contract, and audited by top security firms
-              </p>
-            </div>
-            
-            {/* Card 2 - Growth */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0,219,222,0.2), rgba(0,255,157,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #00dbde',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#00dbde',
-                marginBottom: '1rem'
-              }}>
-                Explosive Growth
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Early access pricing with 50% bonus tokens before major exchange listings and viral marketing campaigns
-              </p>
-            </div>
-            
-            {/* Card 3 - Brainrot */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(138,43,226,0.2), rgba(255,45,149,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #8a2be2',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#8a2be2',
-                marginBottom: '1rem'
-              }}>
-                Pure Brainrot
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Guaranteed to give you maximum brainrot with viral memes, community rewards, and unstoppable energy
-              </p>
-            </div>
-            
-            {/* Card 4 - Community */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,94,0,0.2), rgba(255,45,149,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff5e00',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff5e00',
-                marginBottom: '1rem'
-              }}>
-                Strong Community
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Join thousands of holders in our active Telegram, Discord, and social media communities
-              </p>
-            </div>
-            
-            {/* Card 5 - Delivery */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0,255,157,0.2), rgba(0,219,222,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #00ff9d',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#00ff9d',
-                marginBottom: '1rem'
-              }}>
-                Instant Delivery
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Tokens delivered immediately after payment confirmation with zero delays or complications
-              </p>
-            </div>
-            
-            {/* Card 6 - Potential */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(255,45,149,0.2), rgba(138,43,226,0.2))',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              border: '1px solid #ff2d95',
-              textAlign: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#ff2d95',
-                marginBottom: '1rem'
-              }}>
-                Massive Potential
-              </h3>
-              <p style={{
-                color: '#ddd',
-                fontSize: '0.9rem',
-                lineHeight: '1.6'
-              }}>
-                Early investor advantages with exclusive bonuses, airdrops, and first access to future developments
-              </p>
-            </div>
-          </div>
-        </div>
+        <WhyChooseRot />
 
         {/* COMMUNITY SECTION */}
         <div style={{
