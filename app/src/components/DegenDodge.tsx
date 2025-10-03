@@ -16,17 +16,22 @@ type GameObject = {
   rarity?: number;
 };
 
-type Player = {
+type Particle = {
+  id: number;
   x: number;
   y: number;
-  width: number;
-  height: number;
-  speed: number;
-  isInvincible: boolean;
-  multiplier: number;
-  score: number;
-  rotBalance: number;
-  activeEffects: {type: string, endTime: number}[];
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  type: 'coin' | 'hit' | 'powerup';
+  emoji: string;
+};
+
+type Combo = {
+  count: number;
+  timer: number;
+  position: {x: number, y: number};
 };
 
 const GAME_WIDTH = 400;
@@ -63,6 +68,10 @@ export default function DegenDodge() {
   const lastTimeRef = useRef<number>(0);
   const gameTimeRef = useRef<number>(0);
   
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [combo, setCombo] = useState<Combo>({count: 0, timer: 0, position: {x: 0, y: 0}});
+  const [screenShake, setScreenShake] = useState(0);
+
   const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
   const [player, setPlayer] = useState<Player>({
     x: GAME_WIDTH / 2 - PLAYER_SIZE / 2,
@@ -334,7 +343,6 @@ export default function DegenDodge() {
           activeEffects: newEffects
         };
       });
-
       playSound('powerup');
     }
   };
@@ -637,21 +645,25 @@ export default function DegenDodge() {
             }}
           >
             {obj.emoji}
-            {obj.type === 'rot' && obj.emoji === '🌟' && (
-              <div className="sparkle">✨</div>
+            {obj.type === 'rot' && obj.emoji === ' ' && (
+              <div className="sparkle"> </div>
             )}
           </div>
         ))}
-        
-        {/* Active Effects */}
-        <div className="active-effects">
-          {renderEffectIcons()}
-        </div>
-      </div>
-      
-      <div className="game-controls">
-        <div className="mobile-controls">
-          <button 
+
+        {/* Particles */}
+        {particles.map(particle => (
+          <div
+            key={particle.id}
+            className="particle"
+            style={{
+              left: `${particle.x}px`,
+              top: `${particle.y}px`,
+              opacity: particle.life / particle.maxLife,
+              fontSize: '1.5rem',
+              position: 'absolute',
+              pointerEvents: 'none',
+              zIndex: 10
             className="control-button left" 
             onTouchStart={() => {
               if (!gameStarted || gameOver) return;
